@@ -92,6 +92,12 @@
                         <editorItems:CommonPanel x:Name="commonPanel"/>
                     </WindowsFormsHost>
                 </Expander>
+                <Expander Header="Skill"
+                    Expanded="Expander_Expanded" Collapsed="Expander_Collapsed">
+                    <WindowsFormsHost x:Name="skillPanelHost" Visibility="Collapsed">
+                        <editorItems:SkillPanel x:Name="skillPanel"/>
+                    </WindowsFormsHost>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
 

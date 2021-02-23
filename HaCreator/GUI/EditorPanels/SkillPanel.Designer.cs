@@ -1,0 +1,181 @@
+﻿using HaCreator.CustomControls;
+
+namespace HaCreator.GUI.EditorPanels
+{
+    partial class SkillPanel
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent ()
+        {
+            this.splitContainer3 = new System.Windows.Forms.SplitContainer ();
+            this.splitContainer4 = new System.Windows.Forms.SplitContainer ();
+            this.skillSetListBox = new System.Windows.Forms.ListBox ();
+            this.objL0ListBox = new System.Windows.Forms.ListBox ();
+            this.splitContainer5 = new System.Windows.Forms.SplitContainer ();
+            this.objL1ListBox = new System.Windows.Forms.ListBox ();
+            this.objImagesContainer = new HaCreator.CustomControls.ThumbnailFlowLayoutPanel ();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit ();
+            this.splitContainer3.Panel1.SuspendLayout ();
+            this.splitContainer3.Panel2.SuspendLayout ();
+            this.splitContainer3.SuspendLayout ();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit ();
+            this.splitContainer4.Panel1.SuspendLayout ();
+            this.splitContainer4.Panel2.SuspendLayout ();
+            this.splitContainer4.SuspendLayout ();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).BeginInit ();
+            this.splitContainer5.Panel1.SuspendLayout ();
+            this.splitContainer5.Panel2.SuspendLayout ();
+            this.splitContainer5.SuspendLayout ();
+            this.SuspendLayout ();
+            // 
+            // splitContainer3
+            // 
+            this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer3.Location = new System.Drawing.Point (0, 0);
+            this.splitContainer3.Name = "splitContainer3";
+            this.splitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer3.Panel1
+            // 
+            this.splitContainer3.Panel1.Controls.Add (this.splitContainer4);
+            // 
+            // splitContainer3.Panel2
+            // 
+            this.splitContainer3.Panel2.Controls.Add (this.splitContainer5);
+            this.splitContainer3.Size = new System.Drawing.Size (284, 658);
+            this.splitContainer3.SplitterDistance = 189;
+            this.splitContainer3.TabIndex = 2;
+            // 
+            // splitContainer4
+            // 
+            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer4.Location = new System.Drawing.Point (0, 0);
+            this.splitContainer4.Name = "splitContainer4";
+            this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer4.Panel1
+            // 
+            this.splitContainer4.Panel1.Controls.Add (this.skillSetListBox);
+            // 
+            // splitContainer4.Panel2
+            // 
+            this.splitContainer4.Panel2.Controls.Add (this.objL0ListBox);
+            this.splitContainer4.Size = new System.Drawing.Size (284, 189);
+            this.splitContainer4.SplitterDistance = 113;
+            this.splitContainer4.TabIndex = 0;
+            // 
+            // skillSetListBox
+            // 
+            this.skillSetListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.skillSetListBox.FormattingEnabled = true;
+            this.skillSetListBox.Location = new System.Drawing.Point (0, 0);
+            this.skillSetListBox.Name = "skillSetListBox";
+            this.skillSetListBox.Size = new System.Drawing.Size (284, 113);
+            this.skillSetListBox.TabIndex = 0;
+            this.skillSetListBox.SelectedIndexChanged += new System.EventHandler (this.objSetListBox_SelectedIndexChanged);
+            // 
+            // objL0ListBox
+            // 
+            this.objL0ListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.objL0ListBox.FormattingEnabled = true;
+            this.objL0ListBox.Location = new System.Drawing.Point (0, 0);
+            this.objL0ListBox.Name = "objL0ListBox";
+            this.objL0ListBox.Size = new System.Drawing.Size (284, 72);
+            this.objL0ListBox.TabIndex = 0;
+            // 
+            // splitContainer5
+            // 
+            this.splitContainer5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer5.Location = new System.Drawing.Point (0, 0);
+            this.splitContainer5.Name = "splitContainer5";
+            this.splitContainer5.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer5.Panel1
+            // 
+            this.splitContainer5.Panel1.Controls.Add (this.objL1ListBox);
+            // 
+            // splitContainer5.Panel2
+            // 
+            this.splitContainer5.Panel2.Controls.Add (this.objImagesContainer);
+            this.splitContainer5.Size = new System.Drawing.Size (284, 465);
+            this.splitContainer5.SplitterDistance = 67;
+            this.splitContainer5.TabIndex = 0;
+            // 
+            // objL1ListBox
+            // 
+            this.objL1ListBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.objL1ListBox.FormattingEnabled = true;
+            this.objL1ListBox.Location = new System.Drawing.Point (0, 0);
+            this.objL1ListBox.Name = "objL1ListBox";
+            this.objL1ListBox.Size = new System.Drawing.Size (284, 67);
+            this.objL1ListBox.TabIndex = 0;
+            // 
+            // objImagesContainer
+            // 
+            this.objImagesContainer.AutoScroll = true;
+            this.objImagesContainer.BackColor = System.Drawing.Color.White;
+            this.objImagesContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.objImagesContainer.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.objImagesContainer.Location = new System.Drawing.Point (0, 0);
+            this.objImagesContainer.Name = "objImagesContainer";
+            this.objImagesContainer.Size = new System.Drawing.Size (284, 394);
+            this.objImagesContainer.TabIndex = 0;
+            this.objImagesContainer.WrapContents = false;
+            // 
+            // SkillPanel
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF (96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.Controls.Add (this.splitContainer3);
+            this.Font = new System.Drawing.Font ("Segoe UI", 8.25F);
+            this.Name = "SkillPanel";
+            this.Size = new System.Drawing.Size (284, 658);
+            this.splitContainer3.Panel1.ResumeLayout (false);
+            this.splitContainer3.Panel2.ResumeLayout (false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit ();
+            this.splitContainer3.ResumeLayout (false);
+            this.splitContainer4.Panel1.ResumeLayout (false);
+            this.splitContainer4.Panel2.ResumeLayout (false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit ();
+            this.splitContainer4.ResumeLayout (false);
+            this.splitContainer5.Panel1.ResumeLayout (false);
+            this.splitContainer5.Panel2.ResumeLayout (false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer5)).EndInit ();
+            this.splitContainer5.ResumeLayout (false);
+            this.ResumeLayout (false);
+        }
+
+        #endregion
+
+        private System.Windows.Forms.SplitContainer splitContainer3;
+        private System.Windows.Forms.SplitContainer splitContainer4;
+        private System.Windows.Forms.ListBox skillSetListBox;
+        private System.Windows.Forms.ListBox objL0ListBox;
+        private System.Windows.Forms.SplitContainer splitContainer5;
+        private System.Windows.Forms.ListBox objL1ListBox;
+        private ThumbnailFlowLayoutPanel objImagesContainer;
+    }
+}

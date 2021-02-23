@@ -161,6 +161,12 @@
     <Compile Include="Exceptions\DeserializationException.cs" />
     <Compile Include="Exceptions\NameAlreadyUsedException.cs" />
     <Compile Include="Exceptions\NoVRException.cs" />
+    <Compile Include="GUI\EditorPanels\SkillPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\EditorPanels\SkillPanel.Designer.cs">
+      <DependentUpon>SkillPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\HaEditor.xaml.cs">
       <DependentUpon>HaEditor.xaml</DependentUpon>
     </Compile>
@@ -569,6 +575,9 @@
     <EmbeddedResource Include="GUI\EditorPanels\LifePanel.resx">
       <DependentUpon>LifePanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\EditorPanels\SkillPanel.resx">
+      <DependentUpon>SkillPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\EditorPanels\ObjPanel.resx">
       <DependentUpon>ObjPanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -832,6 +841,9 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="SharpDX">
+      <Version>4.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

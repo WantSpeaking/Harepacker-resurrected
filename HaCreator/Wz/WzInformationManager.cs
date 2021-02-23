@@ -36,6 +36,8 @@ namespace HaCreator.Wz
         public Dictionary<string, int> PortalIdByType = new Dictionary<string,int>();
         public Dictionary<string, PortalGameImageInfo> GamePortals = new Dictionary<string, PortalGameImageInfo>();
 
+        public Dictionary<string, WzImage> SkillSets = new Dictionary<string, WzImage>();
+
         /// <summary>
         /// Clears existing data loaded
         /// </summary>

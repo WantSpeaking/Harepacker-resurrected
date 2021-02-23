@@ -116,6 +116,7 @@ namespace HaCreator.GUI
                 Program.WzManager.ExtractPortals();
                 Program.WzManager.ExtractTileSets();
                 Program.WzManager.ExtractObjSets();
+                Program.WzManager.ExtractSkillSets();
                 Program.WzManager.ExtractBackgroundSets();
             }
             else
@@ -147,6 +148,11 @@ namespace HaCreator.GUI
                 Program.WzManager.LoadWzFile("reactor");
                 Program.WzManager.ExtractReactorFile();
 
+                textBox2.Text = "Initializing Skill.wz...";
+                Application.DoEvents();
+                Program.WzManager.LoadWzFile("skill");
+                Program.WzManager.ExtractSkillSets();
+                
                 // Load sound
                 foreach (string soundWzFile in WzFileManager.SOUND_WZ_FILES)
                 {

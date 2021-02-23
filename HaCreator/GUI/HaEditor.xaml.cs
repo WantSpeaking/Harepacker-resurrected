@@ -67,6 +67,7 @@ namespace HaCreator.GUI
             portalPanelHost.Height = newHeight;
             bgPanelHost.Height = newHeight;
             commonPanelHost.Height = newHeight;
+            skillPanelHost.Height = newHeight;
         }
 
         private void HaEditor2_Loaded(object sender, RoutedEventArgs e)
@@ -83,6 +84,7 @@ namespace HaCreator.GUI
             portalPanel.Initialize(hcsm);
             bgPanel.Initialize(hcsm);
             commonPanel.Initialize(hcsm);
+            skillPanel.Initialize(hcsm);
 
             if (!hcsm.backupMan.AttemptRestore())
             {

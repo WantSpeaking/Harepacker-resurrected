@@ -45,6 +45,16 @@ namespace HaCreator.Wz
             @"C:\MapleStory",
             @"C:\Program Files (x86)\Wizet\MapleStorySEA"
         };
+        
+        public static readonly string[] SKILL_WZ_FILES = { 
+            "Skill", 
+        };
+        
+        public static readonly string[] SKILL_ICONS = { 
+            "icon", 
+            "iconMouseOver", 
+            "iconDisabled", 
+        };
         #endregion
 
 
@@ -405,6 +415,26 @@ namespace HaCreator.Wz
             for (int i = 0; i < Program.InfoManager.PortalTypeById.Count; i++)
             {
                 Program.InfoManager.PortalIdByType[Program.InfoManager.PortalTypeById[i]] = i;
+            }
+        }
+        
+        
+        //Handle skill.wz
+        public void ExtractSkillSets()
+        {
+            foreach (string mapWzFile in SKILL_WZ_FILES)
+            {
+                string skillWzFile_ = mapWzFile.ToLower();
+
+                if (this.wzFiles.ContainsKey(skillWzFile_))
+                {
+                    WzDirectory objParent = (WzDirectory)this[skillWzFile_];
+                    if (objParent != null)
+                    {
+                        foreach (WzImage objset in objParent.WzImages)
+                            Program.InfoManager.SkillSets[WzInfoTools.RemoveExtension(objset.Name)] = objset;
+                    }
+                }
             }
         }
         #endregion

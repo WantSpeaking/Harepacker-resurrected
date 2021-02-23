@@ -50,6 +50,7 @@ namespace HaCreator.MapEditor
         private readonly InputHandler input;
         private TilePanel tilePanel;
         private ObjPanel objPanel;
+        private SkillPanel skillPanel;
         public readonly BackupManager backupMan;
 
         public HaCreatorStateManager(MultiBoard multiBoard, HaRibbon ribbon, System.Windows.Controls.TabControl tabs, InputHandler input,
@@ -976,7 +977,10 @@ namespace HaCreator.MapEditor
         {
             this.objPanel = op;
         }
-
+        public void SetObjPanel(SkillPanel op)
+        {
+            this.skillPanel = op;
+        }
         public void EnterEditMode(ItemTypes type)
         {
             multiBoard.SelectedBoard.EditedTypes = type;

@@ -73,6 +73,28 @@ namespace HaCreator.MapEditor.Info
             return (ObjectInfo)objInfoProp.HCTag;
         }
 
+        /*public static ObjectInfo Get(WzImageProperty objInfoProp)
+        {
+            if (objInfoProp == null)
+            {
+                MapleLib.Helpers.ErrorLogger.Log(ErrorLevel.IncorrectStructure, "objInfoProp is null");
+                return null;
+            }
+
+            if (objInfoProp.HCTag == null)
+            {
+                try
+                {
+                    objInfoProp.HCTag = ObjectInfo.Load((WzSubProperty)objInfoProp, oS, l0, l1, l2);
+                }
+                catch (KeyNotFoundException)
+                {
+                    return null;
+                }
+            }
+            return (ObjectInfo)objInfoProp.HCTag;
+        }*/
+        
         private static List<XNA.Point> ParsePropToOffsetList(WzImageProperty prop)
         {
             List<XNA.Point> result = new List<XNA.Point>();
