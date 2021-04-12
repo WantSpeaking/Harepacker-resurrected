@@ -155,6 +155,9 @@
     <Compile Include="CustomControls\HaList.xaml.cs">
       <DependentUpon>HaList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\ThumbnailTableLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CustomControls\WatermarkTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -558,6 +561,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CustomControls\ScrollablePictureBox.resx">
       <DependentUpon>ScrollablePictureBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomControls\ThumbnailTableLayoutPanel.resx">
+      <DependentUpon>ThumbnailTableLayoutPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\About.resx">
       <DependentUpon>About.cs</DependentUpon>

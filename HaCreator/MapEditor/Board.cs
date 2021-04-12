@@ -25,6 +25,10 @@ namespace HaCreator.MapEditor
 {
     public class Board
     {
+        private Point cellSize = new Point (32,32);
+        private Point cellHorizontalVerticalCount = new Point (8,8);
+
+
         private Point mapSize;
         private Rectangle minimapArea;
         //private Point maxMapSize;
@@ -159,6 +163,15 @@ namespace HaCreator.MapEditor
 
         public void RenderBoard(SpriteBatch sprite)
         {
+            for (int i = 0; i < cellHorizontalVerticalCount.X; i++)
+            {
+                for (int j = 0; j < cellHorizontalVerticalCount.Y; j++)
+                {
+                    parent.DrawRectangle (sprite, new Rectangle (new Point (i*32,j*32),cellSize),Color.Black);
+                }
+            }
+            
+            
             if (mapInfo == null) 
                 return;
             int xShift = centerPoint.X - hScroll;
@@ -219,6 +232,8 @@ namespace HaCreator.MapEditor
             {
                 parent.FillRectangle(sprite, new Rectangle(MultiBoard.VirtualToPhysical(-5, centerPoint.X, hScroll, 0), MultiBoard.VirtualToPhysical(-5 , centerPoint.Y, vScroll, 0), 10, 10), Color.DarkRed);
             }
+
+
         }
 
         public void Dispose()

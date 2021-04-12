@@ -311,6 +311,12 @@ namespace HaCreator.MapEditor
 #endif
             lock (this)
             {
+                if (selectedBoard == null)
+				{
+                    sprite.End ();
+                    return;
+                }
+                    
                 selectedBoard.RenderBoard(sprite);
                 if (selectedBoard.MapSize.X < _CurrentDXWindowSize.Width)
                 {
@@ -750,6 +756,10 @@ namespace HaCreator.MapEditor
         /// <param name="e"></param>
         private void DxContainer_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+			if (selectedBoard==null)
+			{
+                return;
+			}
             lock (this)
             {
                 Point realPosition = new Point(e.X, e.Y);

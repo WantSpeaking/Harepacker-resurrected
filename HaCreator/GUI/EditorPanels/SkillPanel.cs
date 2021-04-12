@@ -292,7 +292,7 @@ namespace HaCreator.GUI.EditorPanels
                         ObjectInfo info = new ObjectInfo (
                             frame1.GetLinkedWzCanvasBitmap (),
                             WzInfoTools.PointFToSystemPoint (frame1.GetCanvasOriginPosition ()),
-                            (string)skillSetListBox.SelectedItem, (string)objL0ListBox.SelectedItem, (string)objL1ListBox.SelectedItem, frame1.Name,
+                            (string)skillSetListBox.SelectedItem, (string)skillSetListBox.SelectedItem, (string)skillSetListBox.SelectedItem, frame1.Name,
                             frame1);
 
                         ImageViewer item = objImagesContainer.Add (frame1.GetBitmap (), frame1.Name, true);
@@ -320,6 +320,11 @@ namespace HaCreator.GUI.EditorPanels
                 hcsm.MultiBoard.Focus ();
                 ((ImageViewer)sender).IsActive = true;
             }
+        }
+
+        private void thumbnailFlowLayoutPanel2_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 
