@@ -193,10 +193,10 @@ namespace MapleLib.WzLib
             switch (reader.ReadByte())
             {
                 case 0x01:
-                case 0x1B:
+                case WzImage.WzImageHeaderByte_WithOffset:
                     return ExtractMore(reader, offset, endOfBlock, name, reader.ReadStringAtOffset(offset + reader.ReadInt32()), parent, imgParent);
                 case 0x00:
-                case 0x73:
+                case WzImage.WzImageHeaderByte_WithoutOffset:
                     return ExtractMore(reader, offset, endOfBlock, name, "", parent, imgParent);
                 default:
                     throw new System.Exception("Invalid byte read at ParseExtendedProp");
@@ -274,5 +274,23 @@ namespace MapleLib.WzLib
         }
         #endregion
 
+        #region Custom Members
+        /// <summary>
+        /// Gets the linked WzImageProperty via WzUOLProperty
+        /// </summary>
+        /// <returns></returns>
+        public WzImageProperty GetLinkedWzImageProperty()
+        {
+            WzImageProperty thisWzImage = this;
+            while ((thisWzImage is WzUOLProperty))
+            {
+                if ((thisWzImage as WzUOLProperty).LinkValue is WzImageProperty newWzImage)
+                    thisWzImage = newWzImage;
+                else // broken link
+                    return this;
+            }
+            return thisWzImage;
+        }
+        #endregion
     }
 }

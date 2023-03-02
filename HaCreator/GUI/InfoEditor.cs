@@ -20,6 +20,7 @@ using MapleLib.WzLib.WzStructure;
 using MapleLib.WzLib.WzStructure.Data;
 using HaCreator.GUI.InstanceEditor;
 using MapleLib.WzLib.WzStructure.Data.MapStructure;
+using HaCreator.Wz;
 
 namespace HaCreator.GUI
 {
@@ -28,14 +29,16 @@ namespace HaCreator.GUI
         public MapInfo info;
         private readonly MultiBoard multiBoard;
         private readonly Board board;
+        private readonly System.Windows.Controls.TabItem tabItem;
 
-        public InfoEditor(Board board, MapInfo info, MultiBoard multiBoard)
+        public InfoEditor(Board board, MapInfo info, MultiBoard multiBoard, System.Windows.Controls.TabItem tabItem)
         {
             InitializeComponent();
 
             this.board = board;
             this.info = info;
             this.multiBoard = multiBoard;
+            this.tabItem = tabItem;
 
             timeLimitEnable.Tag = timeLimit;
             lvLimitEnable.Tag = lvLimit;
@@ -63,9 +66,10 @@ namespace HaCreator.GUI
             summonMobEnable.Tag = new Control[] { timedMobId, timedMobEnable, timedMobMessage };
             autoLieDetectorEnable.Tag = new Control[] { autoLieEnd, autoLieInterval, autoLieProp, autoLieStart };
             allowedItemsEnable.Tag = new Control[] { allowedItems, allowedItemsAdd, allowedItemsRemove };
+            //mirror_Bottom_Enabled.Tag = mirror
 
             this.fieldType.SelectedIndex = 0;
-
+            
             xBox.Value = board.MapSize.X;
             yBox.Value = board.MapSize.Y;
 
@@ -109,6 +113,7 @@ namespace HaCreator.GUI
                 returnHereCBX.Checked = true;
             else forcedRet.Text = info.forcedReturn.ToString();
             mobRate.Value = (decimal)info.mobRate;
+
             //LoadOptionalInt(info.link, linkBox);
             LoadOptionalInt(info.timeLimit, timeLimit, timeLimitEnable);
             LoadOptionalInt(info.lvLimit, lvLimit, lvLimitEnable);
@@ -131,9 +136,13 @@ namespace HaCreator.GUI
             LoadOptionalInt(info.decHP, decHP, hpDecEnable);
             LoadOptionalInt(info.decInterval, decInterval, decIntervalEnable);
             LoadOptionalInt(info.protectItem, protectItem, protectEnable);
+
+            // Help
             helpEnable.Checked = info.help != null;
             if (info.help != null)
                 helpBox.Text = info.help.Replace(@"\n", "\r\n");
+
+            // Time mobs
             if (info.timeMob != null)
             {
                 TimeMob tMob = (TimeMob)info.timeMob;
@@ -143,6 +152,8 @@ namespace HaCreator.GUI
                 timedMobId.Value = tMob.id;
                 timedMobMessage.Text = tMob.message.Replace(@"\n", "\r\n");
             }
+
+            // Lie detector
             if (info.autoLieDetector != null)
             {
                 AutoLieDetector ald = (AutoLieDetector)info.autoLieDetector;
@@ -152,12 +163,15 @@ namespace HaCreator.GUI
                 autoLieInterval.Value = ald.interval;
                 autoLieProp.Value = ald.prop;
             }
+
+            // Allowed item
             if (info.allowedItem != null)
             {
                 allowedItemsEnable.Checked = true;
                 foreach (int id in info.allowedItem)
                     allowedItems.Items.Add(id.ToString());
             }
+
             optionsList.SetChecked(0, info.cloud);
             optionsList.SetChecked(1, info.snow);
             optionsList.SetChecked(2, info.rain);
@@ -180,6 +194,7 @@ namespace HaCreator.GUI
             optionsList.SetChecked(19, info.zakum2Hack);
             optionsList.SetChecked(20, info.allMoveCheck);
             optionsList.SetChecked(21, info.VRLimit);
+            optionsList.SetChecked(22, info.mirror_Bottom);
 
             // Populate field limit items
             // automatically populated via fieldLimitPanel1.Loaed
@@ -313,7 +328,9 @@ namespace HaCreator.GUI
                     info.strCategoryName = categoryBox.Text;
 
                     // We do, however, need to change the tab's name/info
-                    ((TabItemContainer)board.TabPage.Tag).Text = info.strMapName;
+                    ((TabItemContainer)tabItem.Tag).Text = info.strMapName;
+
+                    tabItem.Header = MapLoader.GetFormattedMapNameForTabItem(info.id, info.strStreetName, info.strMapName);
                 }
                 info.returnMap = cannotReturnCBX.Checked ? info.id : (int)returnBox.Value;
                 info.forcedReturn = returnHereCBX.Checked ? 999999999 : (int)forcedRet.Value;
@@ -381,6 +398,8 @@ namespace HaCreator.GUI
                 info.zakum2Hack = optionsList.Checked(19);
                 info.allMoveCheck = optionsList.Checked(20);
                 info.VRLimit = optionsList.Checked(21);
+                info.mirror_Bottom = optionsList.Checked(22);
+
                 info.fieldLimit = (long) fieldLimitPanel1.FieldLimit;
 
                 if (fieldType.SelectedIndex <= 0x22)
@@ -431,11 +450,14 @@ namespace HaCreator.GUI
         {
             CheckBox cbx = (CheckBox)sender;
             bool featureActivated = cbx.Checked && cbx.Enabled;
-            if (cbx.Tag is Control) ((Control)cbx.Tag).Enabled = featureActivated;
+            if (cbx.Tag is Control) 
+                ((Control)cbx.Tag).Enabled = featureActivated;
             else
             {
-                foreach (Control control in (Control[])cbx.Tag) control.Enabled = featureActivated;
-                foreach (Control control in (Control[])cbx.Tag) if (control is CheckBox) enablingCheckBox_CheckChanged(control, e);
+                foreach (Control control in (Control[])cbx.Tag) 
+                    control.Enabled = featureActivated;
+                foreach (Control control in (Control[])cbx.Tag) if (control is CheckBox) 
+                        enablingCheckBox_CheckChanged(control, e);
             }
         }
 

@@ -122,16 +122,22 @@
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="newToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="newToolStripMenuItem.Text" xml:space="preserve">
     <value>New (Ctl + T)</value>
   </data>
   <data name="openToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="openToolStripMenuItem.Text" xml:space="preserve">
     <value>Open WZ; ZLZ.dll (Ctl + O)</value>
+  </data>
+  <data name="toolStripMenuItem_newWzFormat.Size" type="System.Drawing.Size, System.Drawing">
+    <value>223, 30</value>
+  </data>
+  <data name="toolStripMenuItem_newWzFormat.Text" xml:space="preserve">
+    <value>Open WZ .ini (Ctl + I)</value>
   </data>
   <data name="saveToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -151,28 +157,28 @@
 </value>
   </data>
   <data name="saveToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="saveToolStripMenuItem.Text" xml:space="preserve">
     <value>Save...</value>
   </data>
   <data name="toolStripSeparator5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 6</value>
+    <value>220, 6</value>
   </data>
   <data name="copyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="copyToolStripMenuItem.Text" xml:space="preserve">
     <value>Copy (Ctrl+C)</value>
   </data>
   <data name="pasteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="pasteToolStripMenuItem.Text" xml:space="preserve">
     <value>Paste (Ctrl+V)</value>
   </data>
   <data name="toolStripSeparator4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>212, 6</value>
+    <value>220, 6</value>
   </data>
   <data name="reloadAllToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -191,7 +197,7 @@
 </value>
   </data>
   <data name="reloadAllToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="reloadAllToolStripMenuItem.Text" xml:space="preserve">
     <value>Reload All</value>
@@ -214,118 +220,118 @@
 </value>
   </data>
   <data name="unloadAllToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>215, 22</value>
+    <value>223, 30</value>
   </data>
   <data name="unloadAllToolStripMenuItem.Text" xml:space="preserve">
     <value>Unload All</value>
   </data>
   <data name="fileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>37, 21</value>
+    <value>37, 22</value>
   </data>
   <data name="fileToolStripMenuItem.Text" xml:space="preserve">
     <value>File</value>
   </data>
   <data name="wzDirectoryToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzDirectoryToolStripMenuItem.Text" xml:space="preserve">
     <value>Directory</value>
   </data>
   <data name="wzImageToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzImageToolStripMenuItem.Text" xml:space="preserve">
     <value>Image</value>
   </data>
   <data name="wzSubPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzSubPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Sub</value>
   </data>
   <data name="wzUolPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzUolPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Uol</value>
   </data>
   <data name="toolStripSeparator2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>177, 6</value>
+    <value>162, 6</value>
   </data>
   <data name="wzCanvasPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzCanvasPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Canvas / Image</value>
   </data>
   <data name="toolStripSeparator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>177, 6</value>
+    <value>162, 6</value>
   </data>
   <data name="wzStringPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzStringPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>String</value>
   </data>
   <data name="wzByteFloatPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzByteFloatPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Byte or Float</value>
   </data>
   <data name="wzLongPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzLongPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Long</value>
   </data>
   <data name="wzDoublePropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzDoublePropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Double</value>
   </data>
   <data name="wzCompressedIntPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzCompressedIntPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Int</value>
   </data>
   <data name="wzUnsignedShortPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzUnsignedShortPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Short</value>
   </data>
   <data name="toolStripSeparator3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>177, 6</value>
+    <value>162, 6</value>
   </data>
   <data name="wzConvexPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzConvexPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Convex</value>
   </data>
   <data name="wzNullPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzNullPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Null</value>
   </data>
   <data name="wzSoundPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzSoundPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Binary (mp3, bin)</value>
   </data>
   <data name="wzVectorPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzVectorPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Vector (x, y)</value>
   </data>
   <data name="wzLuaPropertyToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>165, 22</value>
   </data>
   <data name="wzLuaPropertyToolStripMenuItem.Text" xml:space="preserve">
     <value>Lua Script</value>
@@ -352,7 +358,7 @@
 </value>
   </data>
   <data name="addToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="addToolStripMenuItem.Text" xml:space="preserve">
     <value>Add</value>
@@ -375,16 +381,16 @@
 </value>
   </data>
   <data name="removeToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="removeToolStripMenuItem.Text" xml:space="preserve">
     <value>Remove (Del)</value>
   </data>
   <data name="toolStripSeparator7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>185, 6</value>
+    <value>142, 6</value>
   </data>
   <data name="undoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="undoToolStripMenuItem.Text" xml:space="preserve">
     <value>Undo</value>
@@ -393,7 +399,7 @@
     <value>False</value>
   </data>
   <data name="redoToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="redoToolStripMenuItem.Text" xml:space="preserve">
     <value>Redo</value>
@@ -402,22 +408,22 @@
     <value>False</value>
   </data>
   <data name="toolStripSeparator6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>185, 6</value>
+    <value>142, 6</value>
   </data>
   <data name="expandAllToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="expandAllToolStripMenuItem.Text" xml:space="preserve">
     <value>Expand All</value>
   </data>
   <data name="collapseAllToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>145, 22</value>
   </data>
   <data name="collapseAllToolStripMenuItem.Text" xml:space="preserve">
     <value>Collapse All</value>
   </data>
   <data name="editToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>39, 21</value>
+    <value>39, 22</value>
   </data>
   <data name="editToolStripMenuItem.Text" xml:space="preserve">
     <value>Edit</value>
@@ -440,8 +446,14 @@
   <data name="imgToolStripMenuItem.Text" xml:space="preserve">
     <value>IMG</value>
   </data>
+  <data name="nXForamtToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>172, 22</value>
+  </data>
+  <data name="nXForamtToolStripMenuItem.Text" xml:space="preserve">
+    <value>NXForamt</value>
+  </data>
   <data name="exportFilesToXMLToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>159, 22</value>
   </data>
   <data name="exportFilesToXMLToolStripMenuItem.Text" xml:space="preserve">
     <value>Export File(s) to</value>
@@ -495,7 +507,7 @@
     <value>IMG</value>
   </data>
   <data name="exportDataToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>159, 22</value>
   </data>
   <data name="exportDataToolStripMenuItem.Text" xml:space="preserve">
     <value>Export Selection</value>
@@ -513,22 +525,22 @@
     <value>IMG</value>
   </data>
   <data name="importToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>159, 22</value>
   </data>
   <data name="importToolStripMenuItem.Text" xml:space="preserve">
     <value>Import</value>
   </data>
   <data name="toolStripSeparator9.Size" type="System.Drawing.Size, System.Drawing">
-    <value>185, 6</value>
+    <value>156, 6</value>
   </data>
   <data name="optionsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>159, 22</value>
   </data>
   <data name="optionsToolStripMenuItem.Text" xml:space="preserve">
     <value>Options...</value>
   </data>
   <data name="toolStripSeparator8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>185, 6</value>
+    <value>156, 6</value>
   </data>
   <data name="searchToolStripMenuItem.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
@@ -547,13 +559,13 @@
 </value>
   </data>
   <data name="searchToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>188, 30</value>
+    <value>159, 22</value>
   </data>
   <data name="searchToolStripMenuItem.Text" xml:space="preserve">
     <value>Search (Ctrl+F)</value>
   </data>
   <data name="toolsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>46, 21</value>
+    <value>46, 22</value>
   </data>
   <data name="toolsToolStripMenuItem.Text" xml:space="preserve">
     <value>Tools</value>
@@ -580,19 +592,19 @@
     <value>1</value>
   </data>
   <data name="fHMappingToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>168, 22</value>
   </data>
   <data name="fHMappingToolStripMenuItem.Text" xml:space="preserve">
     <value>FH Mapping</value>
   </data>
   <data name="toolStripMenuItem_searchWzStrings.Size" type="System.Drawing.Size, System.Drawing">
-    <value>180, 22</value>
+    <value>168, 22</value>
   </data>
   <data name="toolStripMenuItem_searchWzStrings.Text" xml:space="preserve">
     <value>Search WZ strings</value>
   </data>
   <data name="extrasToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>50, 21</value>
+    <value>50, 22</value>
   </data>
   <data name="extrasToolStripMenuItem.Text" xml:space="preserve">
     <value>Extras</value>
@@ -601,7 +613,7 @@
     <value>Segoe UI, 8.25pt</value>
   </data>
   <data name="encryptionBox.Size" type="System.Drawing.Size, System.Drawing">
-    <value>268, 21</value>
+    <value>268, 22</value>
   </data>
   <data name="viewHelpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>173, 22</value>
@@ -616,13 +628,13 @@
     <value>About HaRepacker</value>
   </data>
   <data name="helpToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 21</value>
+    <value>44, 22</value>
   </data>
   <data name="helpToolStripMenuItem.Text" xml:space="preserve">
     <value>Help</value>
   </data>
   <data name="debugToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>93, 21</value>
+    <value>93, 22</value>
   </data>
   <data name="debugToolStripMenuItem.Text" xml:space="preserve">
     <value>DEBUG MODE</value>
@@ -633,8 +645,12 @@
   <data name="mainMenu.Location" type="System.Drawing.Point, System.Drawing">
     <value>0, 0</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="mainMenu.Padding" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 1, 0, 1</value>
+  </data>
   <data name="mainMenu.Size" type="System.Drawing.Size, System.Drawing">
-    <value>997, 25</value>
+    <value>997, 24</value>
   </data>
   <data name="mainMenu.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -654,7 +670,6 @@
   <data name="&gt;&gt;mainMenu.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="AbortButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -689,7 +704,7 @@
     <value>Fill</value>
   </data>
   <data name="tabControl_MainPanels.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 25</value>
+    <value>0, 24</value>
   </data>
   <data name="tabControl_MainPanels.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>3, 2, 3, 2</value>
@@ -698,7 +713,7 @@
     <value>0, 0</value>
   </data>
   <data name="tabControl_MainPanels.Size" type="System.Drawing.Size, System.Drawing">
-    <value>997, 593</value>
+    <value>997, 594</value>
   </data>
   <data name="tabControl_MainPanels.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -2447,6 +2462,12 @@
   <data name="&gt;&gt;openToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="&gt;&gt;toolStripMenuItem_newWzFormat.Name" xml:space="preserve">
+    <value>toolStripMenuItem_newWzFormat</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem_newWzFormat.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="&gt;&gt;saveToolStripMenuItem.Name" xml:space="preserve">
     <value>saveToolStripMenuItem</value>
   </data>
@@ -2685,6 +2706,12 @@
     <value>imgToolStripMenuItem</value>
   </data>
   <data name="&gt;&gt;imgToolStripMenuItem.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;nXForamtToolStripMenuItem.Name" xml:space="preserve">
+    <value>nXForamtToolStripMenuItem</value>
+  </data>
+  <data name="&gt;&gt;nXForamtToolStripMenuItem.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;exportDataToolStripMenuItem.Name" xml:space="preserve">

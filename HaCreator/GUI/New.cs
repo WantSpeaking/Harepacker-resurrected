@@ -7,16 +7,10 @@
 using HaCreator.GUI.InstanceEditor;
 using HaCreator.MapEditor;
 using HaCreator.Wz;
+using HaSharedLibrary.Wz;
 using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using XNA = Microsoft.Xna.Framework;
 
@@ -24,9 +18,9 @@ namespace HaCreator.GUI
 {
     public partial class New : Form
     {
-        private MultiBoard multiBoard;
-        private System.Windows.Controls.TabControl Tabs;
-        private System.Windows.RoutedEventHandler[] rightClickHandler;
+        private readonly MultiBoard multiBoard;
+        private readonly System.Windows.Controls.TabControl Tabs;
+        private readonly System.Windows.RoutedEventHandler[] rightClickHandler;
 
         public New(MultiBoard board, System.Windows.Controls.TabControl Tabs, System.Windows.RoutedEventHandler[] rightClickHandler)
         {
@@ -97,19 +91,15 @@ namespace HaCreator.GUI
 
             long mapid = (long) numericUpDown1.Value; // should be int, but anyway in case the future version uses more than 2.1b
             string mapId_str = mapid.ToString();
-            string mapId_PaddingZeros = mapId_str.PadLeft(9, '0') + ".img"; // 100000000.img.xml
-            string mapcat = "Map" + mapId_PaddingZeros.Substring(0, 1);
 
-            WzDirectory directory = Program.WzManager.FindMapWz(mapcat);
-            WzImage mapImage = (WzImage)directory[mapId_PaddingZeros];
-
+            WzImage mapImage = WzInfoTools.FindMapImage(mapId_str, Program.WzManager);
             if (mapImage == null)
             {
                 MessageBox.Show("Map is null.");
                 return;
             }
 
-            WzSubProperty strMapProp = WzInfoTools.GetMapStringProp(mapId_str);
+            WzSubProperty strMapProp = WzInfoTools.GetMapStringProp(mapId_str, Program.WzManager);
             string cloneMapName = WzInfoTools.GetMapName(strMapProp);
             string cloneStreetName = WzInfoTools.GetMapStreetName(strMapProp);
             string cloneCategoryName = WzInfoTools.GetMapCategoryName(strMapProp);

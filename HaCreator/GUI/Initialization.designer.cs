@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Initialization));
-            this.button1 = new System.Windows.Forms.Button();
+            this.button_initialise = new System.Windows.Forms.Button();
             this.versionBox = new System.Windows.Forms.ComboBox();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.label2 = new System.Windows.Forms.Label();
@@ -40,15 +40,15 @@
             this.button_checkMapErrors = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // button1
+            // button_initialise
             // 
-            this.button1.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.button1.Location = new System.Drawing.Point(5, 65);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(186, 28);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Initialize";
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button_initialise.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
+            this.button_initialise.Location = new System.Drawing.Point(5, 65);
+            this.button_initialise.Name = "button_initialise";
+            this.button_initialise.Size = new System.Drawing.Size(186, 28);
+            this.button_initialise.TabIndex = 1;
+            this.button_initialise.Text = "Initialize";
+            this.button_initialise.Click += new System.EventHandler(this.button_initialise_Click);
             // 
             // versionBox
             // 
@@ -61,7 +61,7 @@
             "Auto-Detect"});
             this.versionBox.Location = new System.Drawing.Point(74, 38);
             this.versionBox.Name = "versionBox";
-            this.versionBox.Size = new System.Drawing.Size(284, 21);
+            this.versionBox.Size = new System.Drawing.Size(237, 21);
             this.versionBox.TabIndex = 3;
             // 
             // toolStripProgressBar1
@@ -106,9 +106,9 @@
             // button2
             // 
             this.button2.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
-            this.button2.Location = new System.Drawing.Point(315, 10);
+            this.button2.Location = new System.Drawing.Point(315, 11);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(42, 21);
+            this.button2.Size = new System.Drawing.Size(54, 21);
             this.button2.TabIndex = 14;
             this.button2.Text = "...";
             this.button2.Click += new System.EventHandler(this.button2_Click);
@@ -117,7 +117,7 @@
             // 
             this.button_checkMapErrors.Location = new System.Drawing.Point(197, 65);
             this.button_checkMapErrors.Name = "button_checkMapErrors";
-            this.button_checkMapErrors.Size = new System.Drawing.Size(160, 28);
+            this.button_checkMapErrors.Size = new System.Drawing.Size(172, 28);
             this.button_checkMapErrors.TabIndex = 15;
             this.button_checkMapErrors.Text = "Check map errors";
             this.button_checkMapErrors.UseVisualStyleBackColor = true;
@@ -125,9 +125,10 @@
             // 
             // Initialization
             // 
+            this.AccessibleRole = System.Windows.Forms.AccessibleRole.ScrollBar;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(360, 131);
+            this.ClientSize = new System.Drawing.Size(372, 133);
             this.Controls.Add(this.button_checkMapErrors);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.pathBox);
@@ -135,7 +136,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.versionBox);
             this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.button_initialise);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -153,7 +154,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button_initialise;
         private System.Windows.Forms.ComboBox versionBox;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.Label label2;

@@ -4,10 +4,13 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+using HaCreator.GUI;
 using HaCreator.MapEditor.Instance;
 using HaCreator.Wz;
+using HaSharedLibrary.Wz;
 using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace HaCreator.MapEditor.Info
@@ -84,10 +87,26 @@ namespace HaCreator.MapEditor.Info
         {
             get {
                 WzStringProperty link = (WzStringProperty)((WzSubProperty)((WzImage)ParentObject)["info"])["link"];
-                if (link != null)
-                    _LinkedWzImage = (WzImage)Program.WzManager["reactor"][link.Value + ".img"];
-                else
-                    _LinkedWzImage = (WzImage)Program.WzManager["reactor"][id + ".img"];
+
+                List<WzDirectory> reactorWzDirs = Program.WzManager.GetWzDirectoriesFromBase("reactor");
+                foreach (WzDirectory reactorWzDir in reactorWzDirs)
+                {
+                    string imgName = WzInfoTools.AddLeadingZeros(id, 7) + ".img";
+
+                    WzObject reactorImage = reactorWzDir?[imgName];
+                    if (reactorImage == null)  
+                        continue;
+
+                    if (link != null)
+                    {
+                        string linkImgName = WzInfoTools.AddLeadingZeros(link.Value, 7) + ".img";
+
+                        _LinkedWzImage = (WzImage) reactorWzDir[linkImgName];
+                    }
+                    else
+                        _LinkedWzImage = (WzImage) reactorImage[imgName];
+                }
+               
                 return _LinkedWzImage; 
             }
             set { this._LinkedWzImage = value; }

@@ -37,17 +37,22 @@ namespace HaCreator.GUI
             this.XMLBox = new System.Windows.Forms.TextBox();
             this.HAMBox = new System.Windows.Forms.TextBox();
             this.HAMSelect = new System.Windows.Forms.RadioButton();
+            this.tabControl_maps = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
             this.mapBrowser = new HaCreator.CustomControls.MapBrowser();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.searchBox = new HaCreator.CustomControls.WatermarkTextBox();
+            this.tabControl_maps.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // loadButton
             // 
             this.loadButton.AccessibleRole = System.Windows.Forms.AccessibleRole.PushButton;
             this.loadButton.Enabled = false;
-            this.loadButton.Location = new System.Drawing.Point(10, 559);
+            this.loadButton.Location = new System.Drawing.Point(8, 601);
             this.loadButton.Name = "loadButton";
-            this.loadButton.Size = new System.Drawing.Size(747, 30);
+            this.loadButton.Size = new System.Drawing.Size(765, 30);
             this.loadButton.TabIndex = 9;
             this.loadButton.Text = "Load";
             this.loadButton.Click += new System.EventHandler(this.LoadButton_Click);
@@ -106,15 +111,49 @@ namespace HaCreator.GUI
             this.HAMSelect.Text = "HAM";
             this.HAMSelect.UseVisualStyleBackColor = true;
             // 
+            // tabControl_maps
+            // 
+            this.tabControl_maps.Controls.Add(this.tabPage1);
+            this.tabControl_maps.Controls.Add(this.tabPage2);
+            this.tabControl_maps.Location = new System.Drawing.Point(8, 86);
+            this.tabControl_maps.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabControl_maps.Name = "tabControl_maps";
+            this.tabControl_maps.SelectedIndex = 0;
+            this.tabControl_maps.Size = new System.Drawing.Size(769, 510);
+            this.tabControl_maps.TabIndex = 10;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.mapBrowser);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Size = new System.Drawing.Size(761, 484);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Maps";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
             // mapBrowser
             // 
             this.mapBrowser.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-            this.mapBrowser.Location = new System.Drawing.Point(10, 86);
+            this.mapBrowser.Location = new System.Drawing.Point(6, 5);
             this.mapBrowser.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.mapBrowser.Name = "mapBrowser";
             this.mapBrowser.Size = new System.Drawing.Size(746, 465);
             this.mapBrowser.TabIndex = 8;
             this.mapBrowser.SelectionChanged += new HaCreator.CustomControls.MapBrowser.MapSelectChangedDelegate(this.MapBrowser_SelectionChanged);
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Size = new System.Drawing.Size(761, 484);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "History";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // searchBox
             // 
@@ -131,10 +170,10 @@ namespace HaCreator.GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(763, 591);
+            this.ClientSize = new System.Drawing.Size(783, 637);
+            this.Controls.Add(this.tabControl_maps);
             this.Controls.Add(this.HAMBox);
             this.Controls.Add(this.HAMSelect);
-            this.Controls.Add(this.mapBrowser);
             this.Controls.Add(this.searchBox);
             this.Controls.Add(this.XMLBox);
             this.Controls.Add(this.XMLSelect);
@@ -151,6 +190,8 @@ namespace HaCreator.GUI
             this.Text = "Load";
             this.Load += new System.EventHandler(this.Load_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Load_KeyDown);
+            this.tabControl_maps.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -166,5 +207,8 @@ namespace HaCreator.GUI
         private CustomControls.MapBrowser mapBrowser;
         private System.Windows.Forms.TextBox HAMBox;
         private System.Windows.Forms.RadioButton HAMSelect;
+        private System.Windows.Forms.TabControl tabControl_maps;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }

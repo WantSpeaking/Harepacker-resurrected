@@ -31,6 +31,8 @@ using HaCreator.MapEditor.Info;
 using HaCreator.MapEditor.Instance.Misc;
 
 using SystemWinCtl = System.Windows.Controls;
+using HaSharedLibrary;
+using MapleLib;
 
 namespace HaCreator.MapEditor
 {
@@ -51,9 +53,10 @@ namespace HaCreator.MapEditor
         private TilePanel tilePanel;
         private ObjPanel objPanel;
         private SkillPanel skillPanel;
+        private System.Windows.Controls.ScrollViewer editorPanel;
         public readonly BackupManager backupMan;
 
-        public HaCreatorStateManager(MultiBoard multiBoard, HaRibbon ribbon, System.Windows.Controls.TabControl tabs, InputHandler input,
+        public HaCreatorStateManager(MultiBoard multiBoard, HaRibbon ribbon, System.Windows.Controls.TabControl tabs, InputHandler input, System.Windows.Controls.ScrollViewer editorPanel,
             SystemWinCtl.TextBlock textblock_CursorX, SystemWinCtl.TextBlock textblock_CursorY, SystemWinCtl.TextBlock textblock_RCursorX, SystemWinCtl.TextBlock textblock_RCursorY, SystemWinCtl.TextBlock textblock_selectedItem)
         {
             this.multiBoard = multiBoard;
@@ -62,6 +65,7 @@ namespace HaCreator.MapEditor
             this.ribbon = ribbon;
             this.tabs = tabs;
             this.input = input;
+            this.editorPanel = editorPanel;
 
             // Status bar
             this.textblock_CursorX = textblock_CursorX;
@@ -304,6 +308,10 @@ namespace HaCreator.MapEditor
                 else if (item is ToolTipInstance tooltipItem)
                 {
                     new TooltipInstanceEditor(tooltipItem).ShowDialog();
+                } 
+                else if (item is MirrorFieldData mirrorFieldItem)
+                {
+                    new MirrorFieldEditor(mirrorFieldItem).ShowDialog();
                 }
             }
             catch (Exception e)
@@ -350,7 +358,7 @@ namespace HaCreator.MapEditor
 
         #region Tab Events
         /// <summary>
-        /// Context menu for editing map info
+        /// Context menu for editing map info (right clicking)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -362,10 +370,12 @@ namespace HaCreator.MapEditor
 
             System.Windows.Controls.TabItem tabItem = (System.Windows.Controls.TabItem)item.Tag;
             TabItemContainer container = (TabItemContainer)tabItem.Tag;
+
             Board selectedBoard = container.Board;
             lock (selectedBoard.ParentControl)
             {
-                new InfoEditor(selectedBoard, selectedBoard.MapInfo, multiBoard).ShowDialog();
+                InfoEditor infoEditor = new InfoEditor(selectedBoard, selectedBoard.MapInfo, multiBoard, tabItem);
+                infoEditor.ShowDialog();
                 if (selectedBoard.ParentControl.SelectedBoard == selectedBoard)
                     selectedBoard.ParentControl.AdjustScrollBars();
             }
@@ -441,18 +451,18 @@ namespace HaCreator.MapEditor
         /// <param name="e"></param>
         private void CloseMapTab(object sender, EventArgs e)
         {
-            if (tabs.Items.Count <= 1) // at least 1 tabs for now
+            if (tabs.Items.Count <= 0) // at least 1 tabs for now
             {
                 return;
             }
             if (MessageBox.Show("Are you sure you want to close this map?", "Close", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
-            System.Windows.Controls.MenuItem item = (System.Windows.Controls.MenuItem)sender; 
+            System.Windows.Controls.MenuItem item = (System.Windows.Controls.MenuItem)sender;
             if (item == null)
                 return;
 
-            System.Windows.Controls.TabItem tabItem = (System.Windows.Controls.TabItem) item.Tag;
+            System.Windows.Controls.TabItem tabItem = (System.Windows.Controls.TabItem)item.Tag;
             TabItemContainer container = (TabItemContainer)tabItem.Tag;
             Board selectedBoard = container.Board;
             lock (selectedBoard.ParentControl)
@@ -462,10 +472,23 @@ namespace HaCreator.MapEditor
 
                 selectedBoard.Dispose();
             }
+
+            UpdateEditorPanelVisibility();
+        }
+
+        /// <summary>
+        /// If there's no more tabs, disable the ability for the user to select any new map objects  to be added
+        /// </summary>
+        public void UpdateEditorPanelVisibility()
+        {
+            editorPanel.IsEnabled = tabs.Items.Count > 0; // at least 1 tabs for now
         }
 
         private void Tabs_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
+            if (multiBoard.SelectedBoard == null)
+                return;
+
             lock (multiBoard)
             {
                 MultiBoard_ReturnToSelectionState();
@@ -481,11 +504,12 @@ namespace HaCreator.MapEditor
                     ribbon.SetLayers(multiBoard.SelectedBoard.Layers);
                     ribbon.SetSelectedLayer(multiBoard.SelectedBoard.SelectedLayerIndex, multiBoard.SelectedBoard.SelectedPlatform, multiBoard.SelectedBoard.SelectedAllLayers, multiBoard.SelectedBoard.SelectedAllPlatforms);
                     ribbon.SetHasMinimap(multiBoard.SelectedBoard.MinimapRectangle != null);
+
+                    ParseVisibleEditedTypes();
                 } else
                 {
                     multiBoard.SelectedBoard = null;
                 }
-                ParseVisibleEditedTypes();
                 multiBoard.Focus();
             }
         }
@@ -564,13 +588,16 @@ namespace HaCreator.MapEditor
             WaitWindow ww = new WaitWindow("Opening HaRepacker...");
             ww.Show();
             Application.DoEvents();
-            HaRepacker.Program.WzFileManager = new HaRepacker.WzFileManager();
+
+            HaRepacker.Program.WzFileManager = new WzFileManager();
             bool firstRun = HaRepacker.Program.PrepareApplication(false);
             HaRepacker.GUI.MainForm mf = new HaRepacker.GUI.MainForm(null, false, firstRun);
             mf.unloadAllToolStripMenuItem.Visible = false;
             mf.reloadAllToolStripMenuItem.Visible = false;
-            foreach (KeyValuePair<string, WzFile> entry in Program.WzManager.wzFiles)
-                mf.Interop_AddLoadedWzFileToManager(entry.Value);
+            foreach (WzFile entry in Program.WzManager.WzFileList)
+            {
+                mf.Interop_AddLoadedWzFileToManager(entry);
+            }
             ww.EndWait();
             lock (multiBoard)
             {
@@ -610,7 +637,9 @@ namespace HaCreator.MapEditor
                                             getTypes(visibleTypes, editedTypes, ItemTypes.Chairs),
                                             getTypes(visibleTypes, editedTypes, ItemTypes.ToolTips),
                                             getTypes(visibleTypes, editedTypes, ItemTypes.Backgrounds),
-                                            getTypes(visibleTypes, editedTypes, ItemTypes.Misc));
+                                            getTypes(visibleTypes, editedTypes, ItemTypes.Misc),
+                                            getTypes(visibleTypes, editedTypes, ItemTypes.MirrorFieldData)
+                                            );
         }
 
         void Ribbon_RandomTilesToggled(bool pressed)
@@ -681,7 +710,7 @@ namespace HaCreator.MapEditor
             }
         }
 
-        void Ribbon_ViewToggled(bool? tiles, bool? objs, bool? npcs, bool? mobs, bool? reactors, bool? portals, bool? footholds, bool? ropes, bool? chairs, bool? tooltips, bool? backgrounds, bool? misc)
+        void Ribbon_ViewToggled(bool? tiles, bool? objs, bool? npcs, bool? mobs, bool? reactors, bool? portals, bool? footholds, bool? ropes, bool? chairs, bool? tooltips, bool? backgrounds, bool? misc, bool? mirrorField)
         {
             lock (multiBoard)
             {
@@ -699,6 +728,8 @@ namespace HaCreator.MapEditor
                 SetTypes(ref newVisibleTypes, ref newEditedTypes, tooltips, ItemTypes.ToolTips);
                 SetTypes(ref newVisibleTypes, ref newEditedTypes, backgrounds, ItemTypes.Backgrounds);
                 SetTypes(ref newVisibleTypes, ref newEditedTypes, misc, ItemTypes.Misc);
+                SetTypes(ref newVisibleTypes, ref newEditedTypes, mirrorField, ItemTypes.MirrorFieldData);
+
                 ApplicationSettings.theoreticalVisibleTypes = newVisibleTypes;
                 ApplicationSettings.theoreticalEditedTypes = newEditedTypes;
                 if (multiBoard.SelectedBoard != null)
@@ -896,48 +927,47 @@ namespace HaCreator.MapEditor
         /// <returns></returns>
         public static string CreateItemDescription(BoardItem item)
         {
-            string lineBreak = Environment.NewLine;
             const string firstLineSpacer = " ";
 
             StringBuilder sb = new StringBuilder();
             if (item is TileInstance)
             {
-                sb.Append("[Tile]").Append(lineBreak);
+                sb.Append("[Tile]").Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append(((TileInfo)item.BaseInfo).tS).Append(@"\").Append(((TileInfo)item.BaseInfo).u).Append(@"\").Append(((TileInfo)item.BaseInfo).no);
             }
             else if (item is ObjectInstance)
             {
-                sb.Append("[Object]").Append(lineBreak);
+                sb.Append("[Object]").Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append(((ObjectInfo)item.BaseInfo).oS).Append(@"\").Append(((ObjectInfo)item.BaseInfo).l0).Append(@"\")
                     .Append(((ObjectInfo)item.BaseInfo).l1).Append(@"\").Append(((ObjectInfo)item.BaseInfo).l2);
             }
             else if (item is BackgroundInstance)
             {
-                sb.Append("[Background]").Append(lineBreak);
+                sb.Append("[Background]").Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append(((BackgroundInfo)item.BaseInfo).bS).Append(@"\").Append((((BackgroundInfo)item.BaseInfo).Type.ToString())).Append(@"\")
                     .Append(((BackgroundInfo)item.BaseInfo).no);
             }
             else if (item is PortalInstance)
             {
-                sb.Append("[Portal]").Append(lineBreak);
-                sb.Append(firstLineSpacer).Append("Name: ").Append(((PortalInstance)item).pn).Append(lineBreak);
+                sb.Append("[Portal]").Append(Environment.NewLine);
+                sb.Append(firstLineSpacer).Append("Name: ").Append(((PortalInstance)item).pn).Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append("Type: ").Append(Tables.PortalTypeNames[((PortalInstance)item).pt]);
             }
             else if (item is MobInstance)
             {
-                sb.Append("[Mob]").Append(lineBreak);
-                sb.Append(firstLineSpacer).Append("Name: ").Append(((MobInfo)item.BaseInfo).Name).Append(lineBreak);
+                sb.Append("[Mob]").Append(Environment.NewLine);
+                sb.Append(firstLineSpacer).Append("Name: ").Append(((MobInfo)item.BaseInfo).Name).Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append("ID: ").Append(((MobInfo)item.BaseInfo).ID);
             }
             else if (item is NpcInstance)
             {
-                sb.Append("[Npc]").Append(lineBreak);
-                sb.Append(firstLineSpacer).Append("Name: ").Append(((NpcInfo)item.BaseInfo).Name).Append(lineBreak);
+                sb.Append("[Npc]").Append(Environment.NewLine);
+                sb.Append(firstLineSpacer).Append("Name: ").Append(((NpcInfo)item.BaseInfo).Name).Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append("ID: ").Append(((NpcInfo)item.BaseInfo).ID);
             }
             else if (item is ReactorInstance)
             {
-                sb.Append("[Reactor]").Append(lineBreak);
+                sb.Append("[Reactor]").Append(Environment.NewLine);
                 sb.Append(firstLineSpacer).Append("ID: ").Append(((ReactorInfo)item.BaseInfo).ID);
             }
             else if (item is FootholdAnchor)
@@ -957,13 +987,18 @@ namespace HaCreator.MapEditor
             {
                 sb.Append("[Tooltip]");
             }
-            else if (item is INamedMisc)
+            else if (item is INamedMisc misc)
             {
-                sb.Append(((INamedMisc)item).Name);
+                sb.Append(misc.Name);
+            } 
+            else if (item is MirrorFieldData mirrorFieldData)
+            {
+                sb.Append("[MirrorFieldData]").Append(Environment.NewLine);
+                sb.Append("Ground reflections for '").Append(mirrorFieldData.MirrorFieldDataType.ToString()).Append("'");
             }
 
-            sb.Append(lineBreak);
-            sb.Append("W: ").Append(item.Width).Append(", H: ").Append(item.Height);
+            sb.Append(Environment.NewLine);
+            sb.Append("width: ").Append(item.Width).Append(", height: ").Append(item.Height);
 
             return sb.ToString();
         }

@@ -15,7 +15,8 @@ using MapleLib.WzLib.WzProperties;
 using HaCreator.MapEditor;
 using HaCreator.Wz;
 using MapleLib.WzLib.Serialization;
-
+using System.Collections.Generic;
+using HaSharedLibrary.Wz;
 
 namespace HaCreator.GUI
 {
@@ -133,6 +134,11 @@ namespace HaCreator.GUI
             loadButton.Enabled = true;
         }
 
+        /// <summary>
+        /// Load map
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LoadButton_Click(object sender, EventArgs e)
         {
             //Hide();
@@ -177,12 +183,24 @@ namespace HaCreator.GUI
 
                 if (selectedName.StartsWith("MapLogin")) // MapLogin, MapLogin1, MapLogin2, MapLogin3
                 {
-                    mapImage = (WzImage)Program.WzManager["ui"][selectedName + ".img"];
+                    List<WzDirectory> uiWzDirs = Program.WzManager.GetWzDirectoriesFromBase("ui");
+                    foreach (WzDirectory uiWzDir in uiWzDirs)
+                    {
+                        mapImage = (WzImage) uiWzDir?[selectedName + ".img"];
+                        if (mapImage != null)
+                            break;
+                    }
                     mapName = streetName = categoryName = selectedName;
                 }
                 else if (mapBrowser.SelectedItem == "CashShopPreview")
                 {
-                    mapImage = (WzImage)Program.WzManager["ui"]["CashShopPreview.img"];
+                    List<WzDirectory> uiWzDirs = Program.WzManager.GetWzDirectoriesFromBase("ui");
+                    foreach (WzDirectory uiWzDir in uiWzDirs)
+                    {
+                        mapImage = (WzImage) uiWzDir?["CashShopPreview.img"];
+                        if (mapImage != null)
+                            break;
+                    }
                     mapName = streetName = categoryName = "CashShopPreview";
                 }
                 else
@@ -190,12 +208,9 @@ namespace HaCreator.GUI
                     string mapid_str = mapBrowser.SelectedItem.Substring(0, 9);
                     int.TryParse(mapid_str, out mapid);
 
-                    string mapcat = "Map" + mapid_str.Substring(0, 1);
+                    mapImage = WzInfoTools.FindMapImage(mapid.ToString(), Program.WzManager);
 
-                    WzDirectory directory = Program.WzManager.FindMapWz(mapcat);
-                    mapImage = (WzImage)directory[mapid_str + ".img"];
-
-                    strMapProp = WzInfoTools.GetMapStringProp(mapid_str);
+                    strMapProp = WzInfoTools.GetMapStringProp(mapid_str, Program.WzManager);
                     mapName = WzInfoTools.GetMapName(strMapProp);
                     streetName = WzInfoTools.GetMapStreetName(strMapProp);
                     categoryName = WzInfoTools.GetMapCategoryName(strMapProp);
@@ -210,6 +225,8 @@ namespace HaCreator.GUI
 
         private void MapBrowser_SelectionChanged()
         {
+            bool bLoadAvailable = mapBrowser.LoadAvailable;
+
             loadButton.Enabled = mapBrowser.LoadAvailable;
         }
 

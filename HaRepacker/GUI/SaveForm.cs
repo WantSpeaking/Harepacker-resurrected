@@ -7,7 +7,6 @@
 using System;
 using System.Windows.Forms;
 using MapleLib.WzLib;
-using MapleLib.WzLib.WzProperties;
 using System.IO;
 using MapleLib.WzLib.Util;
 using System.Diagnostics;
@@ -27,7 +26,7 @@ namespace HaRepacker.GUI
         private readonly bool IsRegularWzFile = false; // or data.wz
 
         public string path;
-        private readonly MainPanel panel;
+        private readonly MainPanel _mainPanel;
 
 
         private bool bIsLoading = false;
@@ -44,12 +43,13 @@ namespace HaRepacker.GUI
             MainForm.AddWzEncryptionTypesToComboBox(encryptionBox);
 
             this.wzNode = wzNode;
-            if (wzNode.Tag is WzImage)
+            if (wzNode.Tag is WzImage) // Data.wz hotfix file
             {
                 this.wzImg = (WzImage)wzNode.Tag;
                 this.IsRegularWzFile = false;
 
-                versionBox.Enabled = false;
+                versionBox.Enabled = false; // disable, not necessary
+                checkBox_64BitFile.Enabled = false; // disable, not necessary
 
             }
             else
@@ -57,7 +57,7 @@ namespace HaRepacker.GUI
                 this.wzf = (WzFile)wzNode.Tag;
                 this.IsRegularWzFile = true;
             }
-            this.panel = panel;
+            this._mainPanel = panel;
         }
 
         /// <summary>
@@ -75,12 +75,16 @@ namespace HaRepacker.GUI
                 {
                     encryptionBox.SelectedIndex = MainForm.GetIndexByWzMapleVersion(wzf.MapleVersion);
                     versionBox.Value = wzf.Version;
+
+                    checkBox_64BitFile.Checked = wzf.Is64BitWzFile;
+                    versionBox.Enabled = wzf.Is64BitWzFile ? false : true; // disable checkbox if its checked as 64-bit, since the version will always be 777
                 }
                 else
                 { // Data.wz uses BMS encryption... no sepcific version indicated
                     encryptionBox.SelectedIndex = MainForm.GetIndexByWzMapleVersion(WzMapleVersion.BMS);
                 }
-            } finally
+            }
+            finally
             {
                 bIsLoading = false;
             }
@@ -120,7 +124,8 @@ namespace HaRepacker.GUI
             {
                 CustomWZEncryptionInputBox customWzInputBox = new CustomWZEncryptionInputBox();
                 customWzInputBox.ShowDialog();
-            } else
+            }
+            else
             {
                 MapleCryptoConstants.UserKey_WzLib = MapleCryptoConstants.MAPLESTORY_USERKEY_DEFAULT.ToArray();
             }
@@ -135,7 +140,7 @@ namespace HaRepacker.GUI
         {
             if (versionBox.Value < 0)
             {
-                Warning.Error(HaRepacker.Properties.Resources.SaveVersionError);
+                Warning.Error(Properties.Resources.SaveVersionError);
                 return;
             }
 
@@ -147,38 +152,47 @@ namespace HaRepacker.GUI
                 HaRepacker.Properties.Resources.WzFilter)
             })
             {
-                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                if (dialog.ShowDialog() != DialogResult.OK)
                     return;
 
+                bool bSaveAs64BitWzFile = checkBox_64BitFile.Checked; // no version number
                 WzMapleVersion wzMapleVersionSelected = MainForm.GetWzMapleVersionByWzEncryptionBoxSelection(encryptionBox.SelectedIndex); // new encryption selected
                 if (this.IsRegularWzFile)
                 {
-                    if (wzf is WzFile file && wzf.MapleVersion != wzMapleVersionSelected)
-                        PrepareAllImgs(file.WzDirectory);
 
-                    wzf.MapleVersion = wzMapleVersionSelected;
-                    if (wzf is WzFile file1)
+                    if (wzf.MapleVersion != wzMapleVersionSelected)
                     {
-                        file1.Version = (short)versionBox.Value;
+                        PrepareAllImgs(wzf.WzDirectory);
                     }
+                    wzf.Version = (short)versionBox.Value;
+                    wzf.MapleVersion = wzMapleVersionSelected;
 
                     if (wzf.FilePath != null && wzf.FilePath.ToLower() == dialog.FileName.ToLower())
                     {
-                        wzf.SaveToDisk(dialog.FileName + "$tmp", wzMapleVersionSelected);
-                        wzNode.DeleteWzNode();
-                        File.Delete(dialog.FileName);
-                        File.Move(dialog.FileName + "$tmp", dialog.FileName);
+                        wzf.SaveToDisk(dialog.FileName + "$tmp", bSaveAs64BitWzFile, wzMapleVersionSelected);
+                        try
+                        {
+                            File.Delete(dialog.FileName);
+                            File.Move(dialog.FileName + "$tmp", dialog.FileName);
+                        }
+                        catch (IOException ex)
+                        {
+                            MessageBox.Show("Handle error overwriting WZ file", HaRepacker.Properties.Resources.Error);
+                        }
                     }
                     else
                     {
-                        wzf.SaveToDisk(dialog.FileName, wzMapleVersionSelected);
-                        wzNode.DeleteWzNode();
+                        wzf.SaveToDisk(dialog.FileName, bSaveAs64BitWzFile, wzMapleVersionSelected);
                     }
+                    _mainPanel.MainForm.UnloadWzFile(wzf);
 
                     // Reload the new file
+                    var loadedFiles = Program.WzFileManager.WzFileList;
                     WzFile loadedWzFile = Program.WzFileManager.LoadWzFile(dialog.FileName, wzMapleVersionSelected);
                     if (loadedWzFile != null)
-                        Program.WzFileManager.AddLoadedWzFileToMainPanel(loadedWzFile, panel);
+                    {
+                        _mainPanel.MainForm.AddLoadedWzObjectToMainPanel(loadedWzFile);
+                    }
                 }
                 else
                 {
@@ -207,7 +221,7 @@ namespace HaRepacker.GUI
                         {
                             Debug.WriteLine(exp); // nvm, dont show to user
                         }
-                        wzNode.DeleteWzNode();
+                        wzNode.DeleteWzNode(); // this is a WzImage, and cannot be unloaded by _mainPanel.MainForm.UnloadWzFile
                     }
                     catch (UnauthorizedAccessException)
                     {
@@ -215,11 +229,12 @@ namespace HaRepacker.GUI
                     }
 
                     // Reload the new file
-                    WzImage img = Program.WzFileManager.LoadDataWzHotfixFile(dialog.FileName, wzMapleVersionSelected, panel);
+                    WzImage img = Program.WzFileManager.LoadDataWzHotfixFile(dialog.FileName, wzMapleVersionSelected);
                     if (img == null || error_noAdminPriviledge)
                     {
-                        MessageBox.Show(HaRepacker.Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
+                        MessageBox.Show(Properties.Resources.MainFileOpenFail, HaRepacker.Properties.Resources.Error);
                     }
+                    _mainPanel.MainForm.AddLoadedWzObjectToMainPanel(img);
                 }
             }
             Close();
@@ -236,6 +251,20 @@ namespace HaRepacker.GUI
             {
                 PrepareAllImgs(subdir);
             }
+        }
+
+        /// <summary>
+        /// On checkBox_64BitFile checked changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBox_64BitFile_CheckedChanged(object sender, EventArgs e)
+        {
+            if (bIsLoading)
+                return;
+
+            CheckBox checkbox_64 = (CheckBox)sender;
+            versionBox.Enabled = checkbox_64.Checked != true; // disable checkbox if its checked as 64-bit, since the version will always be 777
         }
     }
 }

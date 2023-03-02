@@ -20,6 +20,9 @@ using MapleLib.WzLib.Util;
 using System;
 using System.Diagnostics;
 using MapleLib.PacketLib;
+using MapleLib.WzLib.WzStructure.Enums;
+using MapleLib.WzLib.WzProperties;
+using System.Linq;
 
 namespace MapleLib.WzLib
 {
@@ -29,7 +32,7 @@ namespace MapleLib.WzLib
     public class WzDirectory : WzObject
     {
         #region Fields
-        internal List<WzImage> images = new List<WzImage>();
+        private List<WzImage> images = new List<WzImage>();
         internal List<WzDirectory> subDirs = new List<WzDirectory>();
         internal WzBinaryReader reader;
         internal uint offset = 0;
@@ -55,7 +58,7 @@ namespace MapleLib.WzLib
         /// </summary>
         public override WzObjectType ObjectType { get { return WzObjectType.Directory; } }
 
-        public override /*I*/WzFile WzFileParent
+        public override WzFile WzFileParent
         {
             get { return wzFile; }
         }
@@ -90,7 +93,7 @@ namespace MapleLib.WzLib
         /// <summary>
         /// The wz images contained in the directory
         /// </summary>
-        public List<WzImage> WzImages { get { return images; } }
+        public List<WzImage> WzImages { get { return images; } private set { } }
         /// <summary>
         /// The sub directories contained in the directory
         /// </summary>
@@ -180,8 +183,10 @@ namespace MapleLib.WzLib
         /// </summary>
         internal void ParseDirectory(bool lazyParse = false)
         {
-            //Debug.WriteLine(HexTool.ToString( reader.ReadBytes(20)));
-            //reader.BaseStream.Position = reader.BaseStream.Position - 20;
+            //reader.PrintHexBytes(20);
+            long available = reader.Available();
+            if (available == 0)
+                return;
 
             int entryCount = reader.ReadCompressedInt();
             if (entryCount < 0 || entryCount > 100000) // probably nothing > 100k folders for now.
@@ -189,7 +194,7 @@ namespace MapleLib.WzLib
 
             for (int i = 0; i < entryCount; i++)
             {
-                byte type = reader.ReadByte();
+                byte type = reader.ReadByte(); // see WzBinaryWriter.WriteWzObjectValue
                 string fname = null;
                 int fsize;
                 int checksum;
@@ -198,24 +203,27 @@ namespace MapleLib.WzLib
                 long rememberPos = 0;
                 switch (type)
                 {
-                    case 1:  //01 XX 00 00 00 00 00 OFFSET (4 bytes) 
+                    case (byte) WzDirectoryType.UnknownType_1:  //01 XX 00 00 00 00 00 OFFSET (4 bytes) 
                         {
                             int unknown = reader.ReadInt32();
                             reader.ReadInt16();
                             uint offs = reader.ReadOffset();
                             continue;
                         }
-                    case 2:
+                    case (byte) WzDirectoryType.RetrieveStringFromOffset_2:
                         {
                             int stringOffset = reader.ReadInt32();
                             rememberPos = reader.BaseStream.Position;
                             reader.BaseStream.Position = reader.Header.FStart + stringOffset;
+
                             type = reader.ReadByte();
                             fname = reader.ReadString();
+
+                            Console.WriteLine("EntryCount: {0}, type: {1}, fname: {2}", entryCount, type, fname);
                             break;
                         }
-                    case 3:
-                    case 4:
+                    case (byte) WzDirectoryType.WzDirectory_3:
+                    case (byte) WzDirectoryType.WzImage_4:
                         {
                             fname = reader.ReadString();
                             rememberPos = reader.BaseStream.Position;
@@ -223,14 +231,16 @@ namespace MapleLib.WzLib
                         }
                     default:
                         {
-                            break;
+                            reader.PrintHexBytes(20);
+                            throw new Exception("[WzDirectory] Unknown directory. type = " + type);
                         }
                 }
                 reader.BaseStream.Position = rememberPos;
                 fsize = reader.ReadCompressedInt();
                 checksum = reader.ReadCompressedInt();
-                offset = reader.ReadOffset();
-                if (type == 3)
+                offset = reader.ReadOffset(); // IWzArchive::Getposition(pArchive)
+
+                if (type == (byte) WzDirectoryType.WzDirectory_3)
                 {
                     WzDirectory subDir = new WzDirectory(reader, fname, hash, WzIv, wzFile)
                     {
@@ -261,8 +271,11 @@ namespace MapleLib.WzLib
 
             foreach (WzDirectory subdir in subDirs)
             {
-                reader.BaseStream.Position = subdir.offset;
-                subdir.ParseDirectory();
+                if (subdir.Checksum != 0)
+                {
+                    reader.BaseStream.Position = subdir.offset;
+                    subdir.ParseDirectory();
+                }
             }
         }
 
@@ -271,7 +284,7 @@ namespace MapleLib.WzLib
         /// </summary>
         /// <param name="wzWriter"></param>
         /// <param name="fs"></param>
-		internal void SaveImages(BinaryWriter wzWriter, FileStream fs)
+        internal void SaveImages(BinaryWriter wzWriter, FileStream fs)
         {
             // List<string> wzImageNameTracking = new List<string>(); // Check for duplicate WZ image name that could cause errors later on.
 
@@ -285,7 +298,7 @@ namespace MapleLib.WzLib
                 //wzImageNameTracking.Add(img.Name);
 
                 // Write 
-                if (img.bIsImageChanged)
+                if (img.Changed)
                 {
                     fs.Position = img.tempFileStart;
 
@@ -317,7 +330,7 @@ namespace MapleLib.WzLib
         /// <param name="bIsWzUserKeyDefault">Uses the default MapleStory UserKey or a custom key.</param>
         /// <param name="prevOpenedStream">The previously opened file stream</param>
         /// <returns></returns>
-		internal int GenerateDataFile(byte[] useIv, bool bIsWzUserKeyDefault, FileStream prevOpenedStream)
+        internal int GenerateDataFile(byte[] useIv, bool bIsWzUserKeyDefault, FileStream prevOpenedStream)
         {
             bool useCustomIv = useIv != null; // whole shit gonna be re-written if its a custom IV specified
 
@@ -409,14 +422,18 @@ namespace MapleLib.WzLib
             writer.WriteCompressedInt(entryCount);
             foreach (WzImage img in images)
             {
-                writer.WriteWzObjectValue(img.name, 4);
+                if (!writer.WriteWzObjectValue(img.name, WzDirectoryType.WzImage_4))  // true if written as an offset
+                {
+                }
                 writer.WriteCompressedInt(img.BlockSize);
                 writer.WriteCompressedInt(img.Checksum);
                 writer.WriteOffset(img.Offset);
             }
             foreach (WzDirectory dir in subDirs)
             {
-                writer.WriteWzObjectValue(dir.name, 3);
+                if (!writer.WriteWzObjectValue(dir.name, WzDirectoryType.WzDirectory_3)) // true if written as an offset
+                {
+                }
                 writer.WriteCompressedInt(dir.BlockSize);
                 writer.WriteCompressedInt(dir.Checksum);
                 writer.WriteOffset(dir.Offset);
@@ -530,17 +547,21 @@ namespace MapleLib.WzLib
         /// </summary>
         public void ClearImages()
         {
-            foreach (WzImage img in images) img.Parent = null;
+            foreach (WzImage img in images) 
+                img.Parent = null;
             images.Clear();
         }
+
         /// <summary>
         /// Clears the list of sub directories
         /// </summary>
         public void ClearDirectories()
         {
-            foreach (WzDirectory dir in subDirs) dir.Parent = null;
+            foreach (WzDirectory dir in subDirs) 
+                dir.Parent = null;
             subDirs.Clear();
         }
+
         /// <summary>
         /// Gets an image in the list of images by it's name
         /// </summary>
@@ -548,11 +569,10 @@ namespace MapleLib.WzLib
         /// <returns>The wz image that has the specified name or null if none was found</returns>
         public WzImage GetImageByName(string name)
         {
-            foreach (WzImage wzI in images)
-                if (wzI.Name.ToLower() == name.ToLower())
-                    return wzI;
-            return null;
+            // Find the first WzImage with a matching name (case-insensitive)
+            return images.FirstOrDefault(wzI => wzI.Name.ToLower() == name.ToLower());
         }
+
         /// <summary>
         /// Gets a sub directory in the list of directories by it's name
         /// </summary>
@@ -560,25 +580,10 @@ namespace MapleLib.WzLib
         /// <returns>The wz directory that has the specified name or null if none was found</returns>
         public WzDirectory GetDirectoryByName(string name)
         {
-            foreach (WzDirectory dir in subDirs)
-                if (dir.Name.ToLower() == name.ToLower())
-                    return dir;
-            return null;
+            // Find the first WzDirectory with a matching name (case-insensitive)
+            return subDirs.FirstOrDefault(dir => dir.Name.ToLower() == name.ToLower());
         }
-        /// <summary>
-        /// Gets all child images of a WzDirectory
-        /// </summary>
-        /// <returns></returns>
-        public List<WzImage> GetChildImages()
-        {
-            List<WzImage> imgFiles = new List<WzImage>();
-            imgFiles.AddRange(images);
-            foreach (WzDirectory subDir in subDirs)
-            {
-                imgFiles.AddRange(subDir.GetChildImages());
-            }
-            return imgFiles;
-        }
+
         /// <summary>
         /// Removes an image from the list
         /// </summary>

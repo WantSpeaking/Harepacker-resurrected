@@ -93,7 +93,7 @@ namespace MapleLib.WzLib.WzProperties
         public override void WriteValue(WzBinaryWriter writer)
         {
             byte[] data = GetBytes(false);
-            writer.WriteStringValue("Sound_DX8", 0x73, 0x1B);
+            writer.WriteStringValue("Sound_DX8", WzImage.WzImageHeaderByte_WithoutOffset, WzImage.WzImageHeaderByte_WithOffset);
             writer.Write((byte)0);
             writer.WriteCompressedInt(data.Length);
             writer.WriteCompressedInt(len_ms);
@@ -241,26 +241,6 @@ namespace MapleLib.WzLib.WzProperties
             RebuildHeader();
             reader.Dispose();
             this.mp3bytes = File.ReadAllBytes(file);
-        }
-
-        public static bool Memcmp(byte[] a, byte[] b, int n)
-        {
-            for (int i = 0; i < n; i++)
-            {
-                if (a[i] != b[i])
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public static string ByteArrayToString(byte[] ba)
-        {
-            StringBuilder hex = new StringBuilder(ba.Length * 3);
-            foreach (byte b in ba)
-                hex.AppendFormat("{0:x2} ", b);
-            return hex.ToString();
         }
 
         private void RebuildHeader()

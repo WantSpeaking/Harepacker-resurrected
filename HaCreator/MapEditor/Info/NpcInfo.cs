@@ -4,8 +4,10 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+using HaCreator.GUI;
 using HaCreator.MapEditor.Instance;
 using HaCreator.Wz;
+using HaSharedLibrary.Wz;
 using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
 using MapleLib.WzLib.WzStructure;
@@ -30,8 +32,8 @@ namespace HaCreator.MapEditor.Info
         {
             this.id = id;
             this.name = name;
-            if(image!=null && image.Width==1 && image.Height==1)
-                image = global::HaCreator.Properties.Resources.placeholder; 
+            if (image != null && image.Width == 1 && image.Height == 1)
+                image = global::HaCreator.Properties.Resources.placeholder;
         }
 
         private void ExtractPNGFromImage(WzImage image)
@@ -40,7 +42,7 @@ namespace HaCreator.MapEditor.Info
             if (npcImage != null)
             {
                 Image = npcImage.GetLinkedWzCanvasBitmap();
-                if(Image.Width==1 && Image.Height == 1)
+                if (Image.Width == 1 && Image.Height == 1)
                 {
                     Image = global::HaCreator.Properties.Resources.placeholder;
                 }
@@ -63,9 +65,11 @@ namespace HaCreator.MapEditor.Info
 
         public static NpcInfo Get(string id)
         {
-            WzImage npcImage = (WzImage)Program.WzManager["npc"][id + ".img"];
+            string imgName = WzInfoTools.AddLeadingZeros(id, 7) + ".img";
+            WzImage npcImage = (WzImage)Program.WzManager.FindWzImageByName("npc", imgName);
             if (npcImage == null)
                 return null;
+
             if (!npcImage.Parsed)
                 npcImage.ParseImage();
             if (npcImage.HCTag == null)
@@ -78,7 +82,7 @@ namespace HaCreator.MapEditor.Info
         private static NpcInfo Load(WzImage parentObject)
         {
             string id = WzInfoTools.RemoveExtension(parentObject.Name);
-            return new NpcInfo(null, new System.Drawing.Point(), id, WzInfoTools.GetNpcNameById(id), parentObject);
+            return new NpcInfo(null, new System.Drawing.Point(), id, WzInfoTools.GetNpcNameById(id, Program.WzManager), parentObject);
         }
 
         public override BoardItem CreateInstance(Layer layer, Board board, int x, int y, int z, bool flip)
@@ -102,7 +106,7 @@ namespace HaCreator.MapEditor.Info
         public string Name
         {
             get { return name; }
-            private set {  }
+            private set { }
         }
 
         /// <summary>
@@ -115,13 +119,22 @@ namespace HaCreator.MapEditor.Info
                 {
                     WzStringProperty link = (WzStringProperty)((WzSubProperty)((WzImage)ParentObject)["info"])["link"];
                     if (link != null)
-                        _LinkedWzImage = (WzImage)Program.WzManager["npc"][link.Value + ".img"];
+                    {
+                        string linkImgName = WzInfoTools.AddLeadingZeros(link.Value, 7) + ".img";
+                        _LinkedWzImage = (WzImage)Program.WzManager.FindWzImageByName("npc", linkImgName);
+                    }
                     else
-                        _LinkedWzImage = (WzImage)Program.WzManager["npc"][id + ".img"]; // default
+                    {
+                        string imgName = WzInfoTools.AddLeadingZeros(id, 7) + ".img";
+                        _LinkedWzImage = (WzImage)Program.WzManager.FindWzImageByName("npc", imgName); // default
+                    }
                 }
-                return _LinkedWzImage; 
+                return _LinkedWzImage;
             }
-            set { this._LinkedWzImage = value; }
+
+            set { 
+                this._LinkedWzImage = value; 
+            }
         }
     }
 }

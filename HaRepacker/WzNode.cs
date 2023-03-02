@@ -63,14 +63,7 @@ namespace HaRepacker
 
         public void DeleteWzNode()
         {
-            try
-            {
-                Remove();
-            }
-            catch(Exception) 
-            { 
-                throw new Exception("Cannot remove/replace an inlinked node"); 
-            }
+            Remove();
 
             if (Tag is WzImageProperty property)
             {
@@ -117,7 +110,7 @@ namespace HaRepacker
             else if (obj is WzDirectory directory) 
                 return directory[name] == null;
             else if (obj is WzFile file) 
-                return file.WzDirectory[name] == null;
+                return file.WzDirectory?[name] == null;
             else 
                 return false;
         }
@@ -127,7 +120,7 @@ namespace HaRepacker
             WzObject TaggedObject = (WzObject)Tag;
             if (TaggedObject is WzFile file) 
                 TaggedObject = file.WzDirectory;
-
+            
             if (TaggedObject is WzDirectory directory)
             {
                 if (obj is WzDirectory wzDirectory)

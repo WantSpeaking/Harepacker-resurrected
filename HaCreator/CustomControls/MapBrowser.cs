@@ -6,36 +6,36 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Collections;
 using MapleLib.WzLib;
 using MapleLib.WzLib.WzProperties;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using HaCreator.GUI;
+using HaSharedLibrary.Wz;
 
 namespace HaCreator.CustomControls
 {
     public partial class MapBrowser : UserControl
     {
-        private bool load = false;
+        private bool loadMapAvailable = false;
         private readonly List<string> maps = new List<string>();
 
         public MapBrowser()
         {
             InitializeComponent();
+
+            this.minimapBox.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
         public bool LoadAvailable
         {
             get
             {
-                return load;
+                return loadMapAvailable;
             }
         }
 
@@ -70,7 +70,17 @@ namespace HaCreator.CustomControls
             for (int i = 0; i < 20; i++) // Not exceeding 20 logins yet.
             {
                 string imageName = "MapLogin" + (i == 0 ? "" : i.ToString()) + ".img";
-                WzObject mapLogin = Program.WzManager["ui"][imageName];
+
+                WzObject mapLogin = null;
+
+                List<WzDirectory> uiWzFiles = Program.WzManager.GetWzDirectoriesFromBase("ui");
+                foreach (WzDirectory uiWzFile in uiWzFiles)
+                {
+                    mapLogin = uiWzFile?[imageName];
+                    if (mapLogin != null)
+                        break;
+                }
+
                 if (mapLogin == null)
                     break;
                 mapLogins.Add(imageName);
@@ -183,26 +193,29 @@ namespace HaCreator.CustomControls
                 selectedName == "MapLogin1" ||
                 selectedName == "MapLogin2" ||
                 selectedName == "MapLogin3" ||
+                selectedName == "MapLogin4" ||
+                selectedName == "MapLogin5" ||
                 selectedName == "CashShopPreview" ||
                 selectedName == null)
             {
-                linkLabel.Visible = false;
-                mapNotExist.Visible = false;
-                minimapBox.Image = (Image)new Bitmap(1, 1);
-                load = mapNamesBox.SelectedItem != null;
+                panel_linkWarning.Visible = false;
+                panel_mapExistWarning.Visible = false;
+
+                minimapBox.Image = new Bitmap(1, 1);
+                loadMapAvailable = mapNamesBox.SelectedItem != null;
             }
             else
             {
                 string mapid = (selectedName).Substring(0, 9);
-                string mapcat = "Map" + mapid.Substring(0, 1);
 
-                WzImage mapImage = Program.WzManager.FindMapImage(mapid, mapcat);
+                WzImage mapImage =  WzInfoTools.FindMapImage(mapid, Program.WzManager);
                 if (mapImage == null)
                 {
-                    linkLabel.Visible = false;
-                    mapNotExist.Visible = true;
+                    panel_linkWarning.Visible = false;
+                    panel_mapExistWarning.Visible = true;
+
                     minimapBox.Image = (Image)new Bitmap(1, 1);
-                    load = false;
+                    loadMapAvailable = false;
                 }
                 else
                 {
@@ -210,26 +223,29 @@ namespace HaCreator.CustomControls
                     {
                         if (mapImage["info"]["link"] != null)
                         {
-                            linkLabel.Visible = true;
-                            mapNotExist.Visible = false;
-                            minimapBox.Image = (Image)new Bitmap(1, 1);
-                            load = false;
+                            panel_linkWarning.Visible = true;
+                            panel_mapExistWarning.Visible = false;
+                            label_linkMapId.Text = mapImage["info"]["link"].ToString();
+
+                            minimapBox.Image = new Bitmap(1, 1);
+                            loadMapAvailable = false;
                         }
                         else
                         {
-                            linkLabel.Visible = false;
-                            mapNotExist.Visible = false;
-                            load = true;
+                            panel_linkWarning.Visible = false;
+                            panel_mapExistWarning.Visible = false;
+
+                            loadMapAvailable = true;
                             WzCanvasProperty minimap = (WzCanvasProperty)mapImage.GetFromPath("miniMap/canvas");
                             if (minimap != null)
                             {
-                                minimapBox.Image = (Image)minimap.GetLinkedWzCanvasBitmap();
+                                minimapBox.Image = minimap.GetLinkedWzCanvasBitmap();
                             }
                             else
                             {
-                                minimapBox.Image = (Image)new Bitmap(1, 1);
+                                minimapBox.Image = new Bitmap(1, 1);
                             }
-                            load = true;
+                            loadMapAvailable = true;
                         }
                     }
                 }

@@ -6,6 +6,7 @@
 
 using HaCreator.MapEditor;
 using HaCreator.Wz;
+using HaSharedLibrary.Wz;
 using MapleLib.WzLib.WzStructure.Data;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace HaCreator.GUI
 {
     public partial class Save : Form
     {
-        private Board board;
+        private readonly Board board;
 
         public Save(Board board)
         {
@@ -75,7 +76,7 @@ namespace HaCreator.GUI
                 statusLabel.Text = "Out of range";
                 saveButton.Enabled = false;
             }
-            else if (WzInfoTools.GetMapStringProp(id.ToString()) != null)
+            else if (WzInfoTools.GetMapStringProp(id.ToString(), Program.WzManager) != null)
             {
                 statusLabel.Text = "WARNING: Will overwrite existing map";
                 saveButton.Enabled = true;

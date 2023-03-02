@@ -19,6 +19,8 @@ using System.IO;
 using MapleLib.WzLib.Util;
 using System;
 using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace MapleLib.WzLib.WzProperties
 {
@@ -98,10 +100,8 @@ namespace MapleLib.WzLib.WzProperties
             {
                 if (name == "PNG")
                     return imageProp;
-                foreach (WzImageProperty iwp in properties)
-                    if (iwp.Name.ToLower() == name.ToLower())
-                        return iwp;
-                return null;
+                
+                return properties.FirstOrDefault(iwp => iwp.Name.ToLower() == name.ToLower());
             }
             set
             {
@@ -120,10 +120,7 @@ namespace MapleLib.WzLib.WzProperties
 
         public WzImageProperty GetProperty(string name)
         {
-            foreach (WzImageProperty iwp in properties)
-                if (iwp.Name.ToLower() == name.ToLower())
-                    return iwp;
-            return null;
+            return properties.FirstOrDefault(iwp => iwp.Name.ToLower() == name.ToLower());
         }
 
         /// Gets a wz property by a path name
@@ -137,33 +134,28 @@ namespace MapleLib.WzLib.WzProperties
             {
                 return ((WzImageProperty)Parent)[path.Substring(name.IndexOf('/') + 1)];
             }
+
             WzImageProperty ret = this;
-            for (int x = 0; x < segments.Length; x++)
+            foreach (string segment in segments)
             {
-                bool foundChild = false;
-                if (segments[x] == "PNG")
-                {
+                if (segment == "PNG")
                     return imageProp;
-                }
-                foreach (WzImageProperty iwp in ret.WzProperties)
-                {
-                    if (iwp.Name == segments[x])
-                    {
-                        ret = iwp;
-                        foundChild = true;
-                        break;
-                    }
-                }
-                if (!foundChild)
+
+                WzImageProperty iwp = ret.WzProperties.FirstOrDefault(p => p.Name == segment);
+                if (iwp == null)
                 {
                     return null;
                 }
+
+                ret = iwp;
             }
+
             return ret;
         }
-        public override void WriteValue(MapleLib.WzLib.Util.WzBinaryWriter writer)
+        
+        public override void WriteValue(WzBinaryWriter writer)
         {
-            writer.WriteStringValue("Canvas", 0x73, 0x1B);
+            writer.WriteStringValue("Canvas", WzImage.WzImageHeaderByte_WithoutOffset, WzImage.WzImageHeaderByte_WithOffset);
             writer.Write((byte)0);
             if (properties.Count > 0) // subproperty in the canvas
             {
@@ -323,9 +315,27 @@ namespace MapleLib.WzLib.WzProperties
                 {
                     if (!(currentWzObj is WzDirectory))  // keep looping if its not a WzImage
                         continue;
-
                     WzFile wzFileParent = ((WzDirectory)currentWzObj).wzFile;
-                    WzObject foundProperty = wzFileParent.GetObjectFromPath(_outlink);
+
+                    // TODO
+                    // Given the way it is structured, it might possibility also point to a different WZ file (i.e NPC.wz instead of Mob.wz).
+                    // Mob001.wz/8800103.img/8800103.png has an outlink to "Mob/8800141.img/8800141.png"
+                    // https://github.com/lastbattle/Harepacker-resurrected/pull/142
+
+                    Match match = Regex.Match(wzFileParent.Name, @"^([A-Za-z]+)([0-9]*).wz");
+                    string prefixWz = match.Groups[1].Value + "/"; // remove ended numbers and .wz from wzfile name 
+
+                    WzObject foundProperty;
+
+                    if (_outlink.StartsWith(prefixWz))
+                    {
+                        // fixed root path
+                        string realpath = _outlink.Replace(prefixWz, WzFileParent.Name.Replace(".wz", "") + "/");
+                        foundProperty = wzFileParent.GetObjectFromPath(realpath);
+                    } else
+                    {
+                        foundProperty = wzFileParent.GetObjectFromPath(_outlink);
+                    }
                     if (foundProperty != null && foundProperty is WzImageProperty property)
                     {
                         return property;

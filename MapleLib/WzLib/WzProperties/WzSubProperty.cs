@@ -16,7 +16,9 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using MapleLib.WzLib.Util;
+using SharpDX.Direct2D1;
 
 namespace MapleLib.WzLib.WzProperties
 {
@@ -81,12 +83,8 @@ namespace MapleLib.WzLib.WzProperties
         {
             get
             {
-
-                foreach (WzImageProperty iwp in properties)
-                    if (iwp.Name.ToLower() == name.ToLower())
-                        return iwp;
+                return properties.FirstOrDefault(iwp => iwp.Name.ToLower() == name.ToLower());
                 //throw new KeyNotFoundException("A wz property with the specified name was not found");
-                return null;
             }
             set
             {
@@ -111,26 +109,22 @@ namespace MapleLib.WzLib.WzProperties
                 return ((WzImageProperty)Parent)[path.Substring(name.IndexOf('/') + 1)];
             }
             WzImageProperty ret = this;
-            for (int x = 0; x < segments.Length; x++)
+            foreach (string segment in segments)
             {
-                bool foundChild = false;
-                foreach (WzImageProperty iwp in ret.WzProperties)
+                ret = ret.WzProperties.FirstOrDefault(iwp => iwp.Name == segment);
+                if (ret == null)
                 {
-                    if (iwp.Name == segments[x])
-                    {
-                        ret = iwp;
-                        foundChild = true;
-                        break;
-                    }
-                }
-                if (!foundChild)
-                {
-                    return null;
+                    break;
                 }
             }
             return ret;
         }
-        public override void WriteValue(MapleLib.WzLib.Util.WzBinaryWriter writer)
+
+        /// <summary>
+        /// Write the WzSubProperty 
+        /// </summary>
+        /// <param name="writer"></param>
+        public override void WriteValue(WzBinaryWriter writer)
         {
             bool bIsLuaProperty = false;
             if (properties.Count == 1 && properties[0] is WzLuaProperty)
@@ -138,16 +132,47 @@ namespace MapleLib.WzLib.WzProperties
                 bIsLuaProperty = true;
             }
             if (!bIsLuaProperty)
-                writer.WriteStringValue("Property", 0x73, 0x1B);
+                writer.WriteStringValue("Property", WzImage.WzImageHeaderByte_WithoutOffset, WzImage.WzImageHeaderByte_WithOffset);
+
+            // Sort WzCanvasPropertys' in images by their name 
+            // see https://github.com/lastbattle/Harepacker-resurrected/issues/173
+            properties.Sort((img1, img2) =>
+            {
+                if (img1 == null)
+                    return 0;
+                else if (img1.GetType() == typeof(WzCanvasProperty) ||  // frames
+                    img1.GetType() == typeof(WzSubProperty)) // footholds
+                {
+                    int nodeId1, nodeId2;
+                    if (int.TryParse(img1.Name, out nodeId1) && int.TryParse(img2.Name, out nodeId2))
+                    {
+                        if (nodeId1 == nodeId2)
+                            return 0;
+                        if (nodeId1 > nodeId2)
+                            return 1;
+                        return -1;
+                    } else // default to string compare
+                        return img1.Name.CompareTo(img2.Name);
+                }
+                else
+                    return img1.Name.CompareTo(img2.Name);  // (leave non canvas nodes at the very bottom, i.e "info")
+            });
 
             WzImageProperty.WritePropertyList(writer, properties);
         }
+
+        /// <summary>
+        /// Exports as XML
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="level"></param>
         public override void ExportXml(StreamWriter writer, int level)
         {
             writer.WriteLine(XmlUtil.Indentation(level) + XmlUtil.OpenNamedTag("WzSub", this.Name, true));
             WzImageProperty.DumpPropertyList(writer, level, WzProperties);
             writer.WriteLine(XmlUtil.Indentation(level) + XmlUtil.CloseTag("WzSub"));
         }
+
         /// <summary>
         /// Disposes the object
         /// </summary>

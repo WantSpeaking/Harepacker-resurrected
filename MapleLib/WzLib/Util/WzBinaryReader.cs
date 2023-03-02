@@ -15,9 +15,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using MapleLib.MapleCryptoLib;
+using MapleLib.PacketLib;
 
 namespace MapleLib.WzLib.Util
 {
@@ -38,6 +40,23 @@ namespace MapleLib.WzLib.Util
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Sets the base stream position to the header FStart + offset
+        /// </summary>
+        /// <param name="offset"></param>
+        public void SetOffsetFromFStartToPosition(int offset)
+        {
+            BaseStream.Position = Header.FStart + offset;
+        }
+
+        public void RollbackStreamPosition(int byOffset)
+        {
+            if (BaseStream.Position < byOffset)
+                throw new Exception("Cant rollback stream position below 0");
+
+            BaseStream.Position -= byOffset;
+        }
+
         public string ReadStringAtOffset(long Offset)
         {
             return ReadStringAtOffset(Offset, false);
@@ -82,12 +101,12 @@ namespace MapleLib.WzLib.Util
                 {
                     return string.Empty;
                 }
-
+                
                 for (int i = 0; i < length; i++)
                 {
                     ushort encryptedChar = ReadUInt16();
                     encryptedChar ^= mask;
-                    encryptedChar ^= (ushort)((WzKey[i * 2 + 1] << 8) + WzKey[i * 2]);
+                    encryptedChar ^= (ushort)((WzKey[(i * 2 + 1)] << 8) + WzKey[(i * 2)]);
                     retString.Append((char)encryptedChar);
                     mask++;
                 }
@@ -161,6 +180,15 @@ namespace MapleLib.WzLib.Util
             return sb;
         }
 
+        /// <summary>
+        /// The amount of bytes available remaining in the stream
+        /// </summary>
+        /// <returns></returns>
+        public long Available()
+        {
+            return BaseStream.Length - BaseStream.Position;
+        }
+
         public uint ReadOffset()
         {
             uint offset = (uint)BaseStream.Position;
@@ -176,18 +204,31 @@ namespace MapleLib.WzLib.Util
 
         public string DecryptString(char[] stringToDecrypt)
         {
-            string outputString = "";
-            for (int i = 0; i < stringToDecrypt.Length; i++)
-                outputString += (char)(stringToDecrypt[i] ^ ((char)((WzKey[i * 2 + 1] << 8) + WzKey[i * 2])));
-            return outputString;
+            StringBuilder outputString = new StringBuilder();
+
+            int i = 0;
+            foreach (char c in stringToDecrypt)
+            {
+                outputString.Append((char)(c ^ ((char)((WzKey[i * 2 + 1] << 8) + WzKey[i * 2]))));
+                i++;
+            }
+            return outputString.ToString();
         }
+
 
         public string DecryptNonUnicodeString(char[] stringToDecrypt)
         {
-            string outputString = "";
+            // Initialize the output string with the correct capacity
+            StringBuilder outputString = new StringBuilder(stringToDecrypt.Length);
+
             for (int i = 0; i < stringToDecrypt.Length; i++)
-                outputString += (char)(stringToDecrypt[i] ^ WzKey[i]);
-            return outputString;
+            {
+                // Append the decrypted character to the StringBuilder object
+                outputString.Append((char)(stringToDecrypt[i] ^ WzKey[i]));
+            }
+
+            // Convert the StringBuilder object to a string and return it
+            return outputString.ToString();
         }
 
         public string ReadStringBlock(uint offset)
@@ -195,10 +236,10 @@ namespace MapleLib.WzLib.Util
             switch (ReadByte())
             {
                 case 0:
-                case 0x73:
+                case WzImage.WzImageHeaderByte_WithoutOffset:
                     return ReadString();
                 case 1:
-                case 0x1B:
+                case WzImage.WzImageHeaderByte_WithOffset:
                     return ReadStringAtOffset(offset + ReadInt32());
                 default:
                     return "";
@@ -206,5 +247,29 @@ namespace MapleLib.WzLib.Util
         }
 
         #endregion
+
+        #region Debugging Methods
+        /// <summary>
+        /// Prints the next numberOfBytes in the stream in the system debug console.
+        /// </summary>
+        /// <param name="numberOfBytes"></param>
+        public void PrintHexBytes(int numberOfBytes)
+        {
+#if DEBUG // only debug
+            string hex = HexTool.ToString(ReadBytes(numberOfBytes));
+            Debug.WriteLine(hex);
+
+            this.BaseStream.Position -= numberOfBytes;
+#endif
+        }
+#endregion
+
+#region Overrides
+        public override void Close()
+        {
+            // debug here
+            base.Close();
+        }
+#endregion
     }
 }

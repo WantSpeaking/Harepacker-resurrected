@@ -7,7 +7,6 @@ using HaCreator.MapSimulator.Objects;
 using HaCreator.MapSimulator.Objects.FieldObject;
 using HaCreator.MapSimulator.Objects.UIObject;
 using HaCreator.Wz;
-using HaSharedLibrary.Converter;
 using HaSharedLibrary.Render.DX;
 using HaSharedLibrary.Util;
 using MapleLib.WzLib;
@@ -15,6 +14,7 @@ using MapleLib.WzLib.Spine;
 using MapleLib.WzLib.WzProperties;
 using MapleLib.WzLib.WzStructure;
 using MapleLib.WzLib.WzStructure.Data;
+using MapleLib.Converters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Spine;
@@ -22,6 +22,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using HaSharedLibrary.Wz;
+using MapleLib.Helpers;
+using SharpDX.Direct2D1.Effects;
 
 namespace HaCreator.MapSimulator
 {
@@ -235,6 +238,14 @@ namespace HaCreator.MapSimulator
         public static BackgroundItem CreateBackgroundFromProperty(TexturePool texturePool, WzImageProperty source, BackgroundInstance bgInstance, GraphicsDevice device, ref List<WzObject> usedProps, bool flip)
         {
             List<IDXObject> frames = LoadFrames(texturePool, source, bgInstance.BaseX, bgInstance.BaseY, device, ref usedProps, bgInstance.SpineAni);
+            if (frames.Count == 0)
+            {
+                string error = string.Format("[MapSimulatorLoader] 0 frames loaded for bg texture from src: '{0}'", source.FullPath); // Back_003.wz\\BM3_3.img\\spine\\0
+
+                ErrorLogger.Log(ErrorLevel.IncorrectStructure, error);
+                return null;
+            }
+            
             if (frames.Count == 1)
             {
                 return new BackgroundItem(bgInstance.cx, bgInstance.cy, bgInstance.rx, bgInstance.ry, bgInstance.type, bgInstance.a, bgInstance.front, frames[0], flip, bgInstance.screenMode);
@@ -343,17 +354,25 @@ namespace HaCreator.MapSimulator
         public static ReactorItem CreateReactorFromProperty(TexturePool texturePool, ReactorInstance reactorInstance, GraphicsDevice device, ref List<WzObject> usedProps)
         {
             ReactorInfo reactorInfo = (ReactorInfo)reactorInstance.BaseInfo;
-            WzImage linkedReactorImage = reactorInfo.LinkedWzImage;
-
+            
             List<IDXObject> frames = new List<IDXObject>();
 
-            WzImageProperty framesImage = (WzImageProperty) linkedReactorImage["0"]?["0"];
-            if (framesImage != null)
+            WzImage linkedReactorImage = reactorInfo.LinkedWzImage;
+            if (linkedReactorImage != null)
             {
-                frames = LoadFrames(texturePool, framesImage, reactorInstance.X, reactorInstance.Y, device, ref usedProps);
+                WzImageProperty framesImage = (WzImageProperty)linkedReactorImage?["0"]?["0"];
+                if (framesImage != null)
+                {
+                    frames = LoadFrames(texturePool, framesImage, reactorInstance.X, reactorInstance.Y, device, ref usedProps);
+                }
             }
             if (frames.Count == 0)
+            {
+                //string error = string.Format("[MapSimulatorLoader] 0 frames loaded for reactor from src: '{0}'",  reactorInfo.ID);
+
+                //ErrorLogger.Log(ErrorLevel.IncorrectStructure, error);
                 return null;
+            }
             return new ReactorItem(reactorInstance, frames);
         }
         #endregion
@@ -504,22 +523,26 @@ namespace HaCreator.MapSimulator
         /// Draws the frame and the UI of the minimap.
         /// TODO: This whole thing needs to be dramatically simplified via further abstraction to keep it noob-proof :(
         /// </summary>
-        /// <param name="UIWZFile">UI.wz file directory</param>
+        /// <param name="uiWindow1Image">UI.wz/UIWindow1.img pre-bb</param>
+        /// <param name="uiWindow2Image">UI.wz/UIWindow2.img post-bb</param>
+        /// <param name="uiBasicImage">UI.wz/Basic.img</param>
         /// <param name="mapBoard"></param>
         /// <param name="device"></param>
+        /// <param name="UserScreenScaleFactor">The scale factor of the window (DPI)</param>
         /// <param name="MapName">The map name. i.e The Hill North</param>
         /// <param name="StreetName">The street name. i.e Hidden street</param>
+        /// <param name="soundUIImage">Sound.wz/UI.img</param>
         /// <param name="bBigBang">Big bang update</param>
         /// <returns></returns>
-        public static MinimapItem CreateMinimapFromProperty(WzDirectory UIWZFile, Board mapBoard, GraphicsDevice device, string MapName, string StreetName, WzDirectory SoundWZFile, bool bBigBang)
+        public static MinimapItem CreateMinimapFromProperty(WzImage uiWindow1Image, WzImage uiWindow2Image, WzImage uiBasicImage, Board mapBoard, GraphicsDevice device, float UserScreenScaleFactor, string MapName, string StreetName, WzImage soundUIImage, bool bBigBang)
         {
             if (mapBoard.MiniMap == null)
                 return null;
 
-            WzSubProperty minimapFrameProperty = (WzSubProperty)UIWZFile["UIWindow2.img"]?["MiniMap"];
+            WzSubProperty minimapFrameProperty = (WzSubProperty)uiWindow2Image?["MiniMap"];
             if (minimapFrameProperty == null) // UIWindow2 not available pre-BB.
             {
-                minimapFrameProperty = (WzSubProperty)UIWZFile["UIWindow.img"]?["MiniMap"];
+                minimapFrameProperty = (WzSubProperty)uiWindow1Image["MiniMap"];
             }
 
             WzSubProperty maxMapProperty = (WzSubProperty)minimapFrameProperty["MaxMap"];
@@ -559,7 +582,7 @@ namespace HaCreator.MapSimulator
             int effective_width = miniMapImage.Width + e.Width + w.Width;
             int effective_height = miniMapImage.Height + n.Height + s.Height;
 
-            using (System.Drawing.Font font = new System.Drawing.Font(GLOBAL_FONT, TOOLTIP_FONTSIZE))
+            using (System.Drawing.Font font = new System.Drawing.Font(GLOBAL_FONT, TOOLTIP_FONTSIZE / UserScreenScaleFactor))
             {
                 // Get the width of the 'streetName' or 'mapName'
                 System.Drawing.Graphics graphics_dummy = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1)); // dummy image just to get the Graphics object for measuring string
@@ -623,8 +646,8 @@ namespace HaCreator.MapSimulator
                 // >>> If aligning from the left to the right. Items at the left must be at the top of the code
                 // >>> If aligning from the right to the left. Items at the right must be at the top of the code with its (x position - parent width).
                 // TODO: probably a wrapper class in the future, such as HorizontalAlignment and VerticalAlignment, or Grid/ StackPanel 
-                WzBinaryProperty BtMouseClickSoundProperty = (WzBinaryProperty) SoundWZFile["UI.img"]?["BtMouseClick"];
-                WzBinaryProperty BtMouseOverSoundProperty = (WzBinaryProperty)SoundWZFile["UI.img"]?["BtMouseOver"];
+                WzBinaryProperty BtMouseClickSoundProperty = (WzBinaryProperty)soundUIImage["BtMouseClick"];
+                WzBinaryProperty BtMouseOverSoundProperty = (WzBinaryProperty)soundUIImage["BtMouseOver"];
 
                 if (bBigBang)
                 {
@@ -660,10 +683,8 @@ namespace HaCreator.MapSimulator
                 } 
                 else
                 {
-                    WzImage BasicImg = (WzImage) UIWZFile["Basic.img"];
-
-                    WzSubProperty BtMin = (WzSubProperty)BasicImg["BtMin"]; // mininise button
-                    WzSubProperty BtMax = (WzSubProperty)BasicImg["BtMax"]; // maximise button
+                    WzSubProperty BtMin = (WzSubProperty)uiBasicImage["BtMin"]; // mininise button
+                    WzSubProperty BtMax = (WzSubProperty)uiBasicImage["BtMax"]; // maximise button
                     WzSubProperty BtMap = (WzSubProperty)minimapFrameProperty["BtMap"]; // world button
 
                     UIObject objUIBtMap = new UIObject(BtMap, BtMouseClickSoundProperty, BtMouseOverSoundProperty,
@@ -696,11 +717,12 @@ namespace HaCreator.MapSimulator
         /// Tooltip
         /// </summary>
         /// <param name="texturePool"></param>
+        /// <param name="UserScreenScaleFactor">The scale factor of the window (DPI)</param>
         /// <param name="farmFrameParent"></param>
         /// <param name="tooltip"></param>
         /// <param name="device"></param>
         /// <returns></returns>
-        public static TooltipItem CreateTooltipFromProperty(TexturePool texturePool, WzSubProperty farmFrameParent, ToolTipInstance tooltip, GraphicsDevice device)
+        public static TooltipItem CreateTooltipFromProperty(TexturePool texturePool, float UserScreenScaleFactor, WzSubProperty farmFrameParent, ToolTipInstance tooltip, GraphicsDevice device)
         {
             // Wz frames
             System.Drawing.Bitmap c = ((WzCanvasProperty)farmFrameParent?["c"])?.GetLinkedWzCanvasBitmap();
@@ -730,7 +752,7 @@ namespace HaCreator.MapSimulator
             const int HEIGHT_PADDING = 6;
 
             // Create
-            using (System.Drawing.Font font = new System.Drawing.Font(GLOBAL_FONT, TOOLTIP_FONTSIZE))
+            using (System.Drawing.Font font = new System.Drawing.Font(GLOBAL_FONT, TOOLTIP_FONTSIZE / UserScreenScaleFactor))
             {
                 System.Drawing.Graphics graphics_dummy = System.Drawing.Graphics.FromImage(new System.Drawing.Bitmap(1, 1)); // dummy image just to get the Graphics object for measuring string
                 System.Drawing.SizeF tooltipSize = graphics_dummy.MeasureString(renderText, font);

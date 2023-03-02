@@ -57,6 +57,7 @@ namespace HaRepacker
         private ToolStripMenuItem AddUOL;
         private ToolStripMenuItem AddVector;
         private ToolStripMenuItem Rename;
+        private ToolStripMenuItem FixLink;
 
         /*private ToolStripMenuItem ExportPropertySubMenu;
         private ToolStripMenuItem ExportAnimationSubMenu;
@@ -103,9 +104,10 @@ namespace HaRepacker
                     if (!Warning.Warn("Are you sure you want to unload this file?"))
                         return;
 
-                    foreach (WzNode node in GetNodes(sender))
+                    var nodesSelected = GetNodes(sender);
+                    foreach (WzNode node in nodesSelected)
                     {
-                        Program.WzFileManager.UnloadWzFile((WzFile)node.Tag);
+                        parentPanel.MainForm.UnloadWzFile(node.Tag as WzFile);
                     }
                 }));
             Reload = new ToolStripMenuItem("Reload", Properties.Resources.arrow_refresh, new EventHandler(
@@ -114,9 +116,10 @@ namespace HaRepacker
                     if (!Warning.Warn("Are you sure you want to reload this file?"))
                         return;
 
-                    foreach (WzNode node in GetNodes(sender))
+                    var nodesSelected = GetNodes(sender);
+                    foreach (WzNode node in nodesSelected) // selected nodes
                     {
-                        Program.WzFileManager.ReloadWzFile((WzFile)node.Tag, parentPanel);
+                        parentPanel.MainForm.ReloadWzFile(node.Tag as WzFile);
                     }
                 }));
             CollapseAllChildNode = new ToolStripMenuItem("Collapse All", Properties.Resources.collapse, new EventHandler(
@@ -140,7 +143,7 @@ namespace HaRepacker
                 {
                     foreach (WzNode node in GetNodes(sender))
                     {
-                        Program.WzFileManager.SortNodesRecursively(node, true);
+                        parentPanel.MainForm.SortNodesRecursively(node, true);
                     }
                 }));
 
@@ -324,6 +327,12 @@ namespace HaRepacker
                     haRepackerMainPanel.AddWzVectorPropertyToSelectedIndex(nodes[0]);
                 }));
 
+            FixLink = new ToolStripMenuItem("Fix linked image for old MapleStory ver.", null, new EventHandler(
+                delegate (object sender, EventArgs e)
+                {
+                    haRepackerMainPanel.FixLinkForOldMS_Click();
+                }));
+
             AddConvexSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddVector);
             AddDirsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddDirectory, AddImage);
             AddPropsSubMenu = new ToolStripMenuItem("Add", Properties.Resources.add, AddCanvas, AddConvex, AddDouble, AddByteFloat, AddLong, AddInt, AddNull, AddUshort, AddSound, AddString, AddSub, AddUOL, AddVector);
@@ -378,11 +387,13 @@ namespace HaRepacker
             else if (Tag is WzFile)
             {
                 toolStripmenuItems.Add(AddDirsSubMenu);
+                toolStripmenuItems.Add(Rename);
                 toolStripmenuItems.Add(SaveFile);
                 toolStripmenuItems.Add(Unload);
                 toolStripmenuItems.Add(Reload);
             }
 
+            toolStripmenuItems.Add(FixLink);
             toolStripmenuItems.Add(ExpandAllChildNode);
             toolStripmenuItems.Add(CollapseAllChildNode);
             toolStripmenuItems.Add(SortAllChildNode);

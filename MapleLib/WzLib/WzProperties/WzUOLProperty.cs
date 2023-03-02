@@ -105,9 +105,9 @@ namespace MapleLib.WzLib.WzProperties
 		/// </summary>
 		public override WzPropertyType PropertyType { get { return WzPropertyType.UOL; } }
 
-		public override void WriteValue(MapleLib.WzLib.Util.WzBinaryWriter writer)
+		public override void WriteValue(WzBinaryWriter writer)
 		{
-			writer.WriteStringValue("UOL", 0x73, 0x1B);
+			writer.WriteStringValue("UOL", WzImage.WzImageHeaderByte_WithoutOffset, WzImage.WzImageHeaderByte_WithOffset);
 			writer.Write((byte)0);
 			writer.WriteStringValue(Value, 0, 1);
 		}
@@ -153,15 +153,20 @@ namespace MapleLib.WzLib.WzProperties
 						{
                             if (linkVal is WzImageProperty)
                                 linkVal = ((WzImageProperty)linkVal)[path];
-                            else if (linkVal is WzImage image)
+                            else if (linkVal is WzImage image) 
                                 linkVal = image[path];
-                            else if (linkVal is WzDirectory directory)
-                                linkVal = directory[path];
-                            else
-                            {
-                                MapleLib.Helpers.ErrorLogger.Log(MapleLib.Helpers.ErrorLevel.Critical, "UOL got nexon'd at property: " + this.FullPath);
-                                return null;
-                            }
+							else if (linkVal is WzDirectory directory)
+							{
+								if (path.EndsWith(".img"))
+									linkVal = directory[path];
+								else
+									linkVal = directory[path + ".img"];
+							}
+							else
+							{
+								MapleLib.Helpers.ErrorLogger.Log(Helpers.ErrorLevel.Critical, "UOL got nexon'd at property: " + this.FullPath);
+								return null;
+							}
 						}
 					}
 				}

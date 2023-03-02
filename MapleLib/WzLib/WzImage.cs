@@ -19,8 +19,7 @@ using System.IO;
 using System;
 using MapleLib.WzLib.Util;
 using MapleLib.WzLib.WzProperties;
-using System.Diagnostics;
-using MapleLib.PacketLib;
+using System.Linq;
 
 namespace MapleLib.WzLib
 {
@@ -31,7 +30,14 @@ namespace MapleLib.WzLib
     {
         //TODO: nest wzproperties in a wzsubproperty inside of WzImage
 
-        public const int WzImageHeaderByte = 0x73;
+        /// <summary>
+        /// bExistID_0x73
+        /// </summary>
+        public const int WzImageHeaderByte_WithoutOffset = 0x73;
+        /// <summary>
+        /// bNewID_0x1b
+        /// </summary>
+        public const int WzImageHeaderByte_WithOffset = 0x1B;
 
         #region Fields
         internal bool parsed = false;
@@ -82,6 +88,14 @@ namespace MapleLib.WzLib
             this.blockStart = (int)reader.BaseStream.Position;
             this.checksum = 0;
         }
+
+        /// <summary>
+        /// WzImage Constructor
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="reader"></param>
+        /// <param name="checksum"></param>
+        /// <param name="unk_GMS230"></param>
         internal WzImage(string name, WzBinaryReader reader, int checksum)
         {
             this.name = name;
@@ -93,7 +107,6 @@ namespace MapleLib.WzLib
         public override void Dispose()
         {
             name = null;
-            reader = null;
             if (properties != null)
             {
                 foreach (WzImageProperty prop in properties)
@@ -102,6 +115,12 @@ namespace MapleLib.WzLib
                 }
                 properties.Clear();
                 properties = null;
+            }
+            if (reader != null)
+            {
+                reader.Close();
+                reader.Dispose();
+                reader = null;
             }
         }
         #endregion
@@ -144,7 +163,7 @@ namespace MapleLib.WzLib
             private set {  } 
         }
         /// <summary>
-        /// The offset of the image
+        /// The offset of the start of this image
         /// </summary>
         public uint Offset { get { return offset; } set { offset = value; } }
         public int BlockStart { get { return blockStart; } }
@@ -198,11 +217,12 @@ namespace MapleLib.WzLib
         {
             get
             {
-                if (reader != null) if (!parsed) ParseImage();
-                foreach (WzImageProperty iwp in properties)
-                    if (iwp.Name.ToLower() == name.ToLower())
-                        return iwp;
-                return null;
+                if (reader != null) 
+                    if (!parsed) 
+                        ParseImage();
+                
+                // Find the first WzImageProperty with a matching name (case-insensitive)
+                return properties.FirstOrDefault(iwp => iwp.Name.ToLower() == name.ToLower());
             }
             set
             {
@@ -226,30 +246,24 @@ namespace MapleLib.WzLib
             if (reader != null) if (!parsed) ParseImage();
 
             string[] segments = path.Split(new char[1] { '/' }, System.StringSplitOptions.RemoveEmptyEntries);
+
+            // If the first segment is "..", return null
             if (segments[0] == "..")
-            {
                 return null;
-            }
 
             WzImageProperty ret = null;
-            for (int x = 0; x < segments.Length; x++)
-            {
-                bool foundChild = false;
 
-                foreach (WzImageProperty iwp in (ret == null ? this.properties : ret.WzProperties))
-                {
-                    if (iwp.Name == segments[x])
-                    {
-                        ret = iwp;
-                        foundChild = true;
-                        break;
-                    }
-                }
-                if (!foundChild)
-                {
+            foreach (string segment in segments)
+            {
+                // Check if the current property has a child with the matching name
+                ret = (ret == null ? this.properties : ret.WzProperties)
+                    .FirstOrDefault(iwp => iwp.Name == segment);
+
+                // If no matching child was found, return null
+                if (ret == null)
                     return null;
-                }
             }
+
             return ret;
         }
 
@@ -260,7 +274,8 @@ namespace MapleLib.WzLib
         public void AddProperty(WzImageProperty prop)
         {
             prop.Parent = this;
-            if (reader != null && !parsed) ParseImage();
+            if (reader != null && !parsed) 
+                ParseImage();
             properties.Add(prop);
         }
         /// <summary>
@@ -280,13 +295,15 @@ namespace MapleLib.WzLib
         /// <param name="name">The name of the property to remove</param>
         public void RemoveProperty(WzImageProperty prop)
         {
-            if (reader != null && !parsed) ParseImage();
+            if (reader != null && !parsed) 
+                ParseImage();
             prop.Parent = null;
             properties.Remove(prop);
         }
         public void ClearProperties()
         {
-            foreach (WzImageProperty prop in properties) prop.Parent = null;
+            foreach (WzImageProperty prop in properties) 
+                prop.Parent = null;
             properties.Clear();
         }
 
@@ -355,7 +372,7 @@ namespace MapleLib.WzLib
                             }
                             return false; // unhandled for now, if it isnt an .lua image
                         }
-                    case WzImageHeaderByte:
+                    case WzImageHeaderByte_WithoutOffset:
                         {
                             string prop = reader.ReadString();
                             ushort val = reader.ReadUInt16();
@@ -442,8 +459,9 @@ namespace MapleLib.WzLib
             {
                 long pos = reader.BaseStream.Position;
                 reader.BaseStream.Position = offset;
-                writer.Write(reader.ReadBytes(size));
-                reader.BaseStream.Position = pos;
+                writer.Write(reader.ReadBytes((int) pos));
+
+                reader.BaseStream.Position = pos; // reset
             }
         }
 
