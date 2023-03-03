@@ -771,7 +771,7 @@ namespace HaCreator.MapEditor
 
             lock (this)
             {
-                Point realPosition = new Point(e.X, e.Y);
+                Point realPosition = new Point(e.X/16*16, e.Y / 16 * 16);
 
                 if (VirtualToPhysical(selectedBoard.Mouse.X, selectedBoard.CenterPoint.X, selectedBoard.hScroll, 0) != realPosition.X 
                     || VirtualToPhysical(selectedBoard.Mouse.Y, selectedBoard.CenterPoint.Y, selectedBoard.vScroll, 0) != realPosition.Y)

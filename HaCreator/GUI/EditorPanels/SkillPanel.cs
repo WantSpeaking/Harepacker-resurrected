@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using HaCreator.Wz;
 using MapleLib.WzLib.WzStructure;
 using WeifenLuo.WinFormsUI.Docking;
+using HaSharedLibrary.Wz;
 
 namespace HaCreator.GUI.EditorPanels
 {
@@ -281,6 +282,13 @@ namespace HaCreator.GUI.EditorPanels
                         }
                     }
                 }*/
+                //var oS = (KeyValuePair<string, WzImage>)skillSetListBox.SelectedItem;
+
+                WzImage stringWzImg = (WzImage)Program.WzManager.FindWzImageByName("string", "Skill.img");
+                if (!stringWzImg.Parsed)
+                    stringWzImg.ParseImage();
+                
+
 
                 WzImageProperty tCat = Program.InfoManager.SkillSets[(string)skillSetListBox.SelectedItem]["skill"];
                 foreach (var l1Prop in tCat.WzProperties)
@@ -295,7 +303,8 @@ namespace HaCreator.GUI.EditorPanels
                             (string)skillSetListBox.SelectedItem, (string)skillSetListBox.SelectedItem, (string)skillSetListBox.SelectedItem, frame1.Name,
                             frame1);
 
-                        ImageViewer item = objImagesContainer.Add (frame1.GetBitmap (), frame1.Name, true);
+                        var skillName = stringWzImg[l1Prop.Name]?["name"].GetString();
+                        ImageViewer item = objImagesContainer.Add (frame1.GetBitmap (), skillName, true);
                         item.Tag = info;
                         item.MouseDown += new MouseEventHandler (tileItem_Click);
                         item.MouseUp += new MouseEventHandler (ImageViewer.item_MouseUp);

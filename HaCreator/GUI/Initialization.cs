@@ -184,19 +184,24 @@ namespace HaCreator.GUI
                 ExtractNpcFile();
 
                 // Load reactor
-                List<string> reactorWzFiles = Program.WzManager.GetWzFileNameListFromBase("reactor");
+          /*      List<string> reactorWzFiles = Program.WzManager.GetWzFileNameListFromBase("reactor");
                 foreach (string reactor in reactorWzFiles)
                 {
                     UpdateUI_CurrentLoadingWzFile(reactor);
 
                     Program.WzManager.LoadWzFile(reactor, _wzMapleVersion);
                 }
-                ExtractReactorFile();
+                ExtractReactorFile();*/
 
-                textBox2.Text = "Initializing Skill.wz...";
-                Application.DoEvents();
-                Program.WzManager.LoadWzFile("skill");
-                Program.WzManager.ExtractSkillSets();
+                // Load skill
+                List<string> skillWzFiles = Program.WzManager.GetWzFileNameListFromBase("skill");
+                foreach (string skill in skillWzFiles)
+                {
+                    UpdateUI_CurrentLoadingWzFile(skill);
+
+                    Program.WzManager.LoadWzFile(skill, _wzMapleVersion);
+                }
+                ExtractSkillSets();
                 
                 // Load sound
                 List<string> soundWzFiles = Program.WzManager.GetWzFileNameListFromBase("sound");
@@ -531,6 +536,19 @@ namespace HaCreator.GUI
                 {
                     ReactorInfo reactor = ReactorInfo.Load(reactorImage);
                     Program.InfoManager.Reactors[reactor.ID] = reactor;
+                }
+            }
+        }
+
+        public void ExtractSkillSets()
+        {
+            List<WzDirectory> skillWzDirs = Program.WzManager.GetWzDirectoriesFromBase("skill");
+
+            foreach (var skillWzDir in skillWzDirs)
+            {
+                foreach (var skillImage in skillWzDir.WzImages)
+                {
+                    Program.InfoManager.SkillSets[WzInfoTools.RemoveExtension(skillImage.Name)] = skillImage;
                 }
             }
         }
